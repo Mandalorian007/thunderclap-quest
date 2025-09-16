@@ -1,48 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { PlayerSchema } from "./schemas/player";
 
-// Get or create player by Discord ID
-export const getOrCreatePlayer = mutation({
-  args: {
-    userId: v.string(),
-    displayName: v.string()
-  },
-  handler: async (ctx, { userId, displayName }) => {
-    // Check if player already exists
-    const existingPlayer = await ctx.db
-      .query("players")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .first();
-
-    if (existingPlayer) {
-      // Update last active timestamp and display name
-      await ctx.db.patch(existingPlayer._id, {
-        lastActive: Date.now(),
-        displayName
-      });
-      return existingPlayer;
-    }
-
-    // Create new player
-    const newPlayer = {
-      userId,
-      displayName,
-      createdAt: Date.now(),
-      lastActive: Date.now(),
-      xp: 0,
-      level: 1,
-      titles: [],
-      equippedGear: {},
-      inventory: []
-    };
-
-    const playerId = await ctx.db.insert("players", newPlayer);
-    return await ctx.db.get(playerId);
-  }
-});
-
-// Get player data
+// Get player by Discord ID
 export const getPlayer = query({
   args: { userId: v.string() },
   handler: async (ctx, { userId }) => {
@@ -53,31 +12,33 @@ export const getPlayer = query({
   }
 });
 
-// Award XP to player
-export const awardXP = mutation({
+// Create or update player
+export const createPlayer = mutation({
   args: {
     userId: v.string(),
-    xpAmount: v.number()
+    displayName: v.string()
   },
-  handler: async (ctx, { userId, xpAmount }) => {
-    const player = await ctx.db
+  handler: async (ctx, { userId, displayName }) => {
+    // Check if player exists
+    const existing = await ctx.db
       .query("players")
       .withIndex("userId", (q) => q.eq("userId", userId))
       .first();
 
-    if (!player) {
-      throw new Error("Player not found");
+    if (existing) {
+      // Update display name and return
+      await ctx.db.patch(existing._id, { displayName });
+      return await ctx.db.get(existing._id);
     }
 
-    const newXP = player.xp + xpAmount;
-    const newLevel = Math.floor(Math.sqrt(newXP / 100)) + 1; // Simple level formula
-
-    await ctx.db.patch(player._id, {
-      xp: newXP,
-      level: newLevel,
-      lastActive: Date.now()
+    // Create new player
+    const playerId = await ctx.db.insert("players", {
+      userId,
+      displayName,
+      xp: 0,
+      level: 1,
     });
 
-    return { xpAwarded: xpAmount, newXP, newLevel };
+    return await ctx.db.get(playerId);
   }
 });
