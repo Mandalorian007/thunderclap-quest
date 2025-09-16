@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as players from "../players.js";
+import type * as schemas_player from "../schemas/player.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -25,6 +26,7 @@ import type * as players from "../players.js";
  */
 declare const fullApi: ApiFromModules<{
   players: typeof players;
+  "schemas/player": typeof schemas_player;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

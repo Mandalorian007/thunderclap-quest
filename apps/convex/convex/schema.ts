@@ -1,11 +1,8 @@
 import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { zodOutputToConvex } from "convex-helpers/server/zod";
+import { PlayerSchema } from "./schemas/player";
 
 export default defineSchema({
-  players: defineTable({
-    userId: v.string(),        // Discord ID
-    displayName: v.string(),   // Discord username
-    xp: v.number(),           // Experience points
-    level: v.number(),        // Current level
-  }).index("userId", ["userId"]),
+  players: defineTable(zodOutputToConvex(PlayerSchema))
+    .index("userId", ["userId"]),
 });

@@ -1,9 +1,17 @@
 import { mutation, query } from "./_generated/server";
+import { zCustomQuery, zCustomMutation } from "convex-helpers/server/zod";
+import { NoOp } from "convex-helpers/server/customFunctions";
 import { v } from "convex/values";
+import { z } from "zod";
+import { PlayerSchema } from "./schemas/player";
+
+// Set up Zod-validated functions
+const zQuery = zCustomQuery(query, NoOp);
+const zMutation = zCustomMutation(mutation, NoOp);
 
 // Get player by Discord ID
-export const getPlayer = query({
-  args: { userId: v.string() },
+export const getPlayer = zQuery({
+  args: { userId: z.string() },
   handler: async (ctx, { userId }) => {
     return await ctx.db
       .query("players")
@@ -13,10 +21,10 @@ export const getPlayer = query({
 });
 
 // Create or update player
-export const createPlayer = mutation({
+export const createPlayer = zMutation({
   args: {
-    userId: v.string(),
-    displayName: v.string()
+    userId: z.string(),
+    displayName: z.string()
   },
   handler: async (ctx, { userId, displayName }) => {
     // Check if player exists
@@ -31,14 +39,15 @@ export const createPlayer = mutation({
       return await ctx.db.get(existing._id);
     }
 
-    // Create new player
-    const playerId = await ctx.db.insert("players", {
+    // Create new player using Zod schema for validation
+    const playerData = PlayerSchema.parse({
       userId,
       displayName,
       xp: 0,
       level: 1,
     });
 
+    const playerId = await ctx.db.insert("players", playerData);
     return await ctx.db.get(playerId);
   }
 });

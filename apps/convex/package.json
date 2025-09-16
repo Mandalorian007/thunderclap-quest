@@ -12,7 +12,7 @@
   "dependencies": {
     "convex": "^1.27.0",
     "convex-helpers": "^0.1.104",
-    "zod": "^4.1.8"
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
