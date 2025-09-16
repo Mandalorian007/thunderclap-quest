@@ -52,15 +52,39 @@ Same user data accessible via bot commands AND web interface
 ### 4. Database & Backend (Convex)
 **Purpose**: Real-time data management and game logic
 
-**Key Collections**:
-- `players` - User profiles, progress, inventory
-- `encounters` - Dynamic encounter definitions and outcomes
-- `guilds` - Server-specific settings
+**Vertical Slice Organization**:
+```
+convex/
+├── features/               # Feature-based vertical slices
+│   ├── profile/           # Player profile feature
+│   │   ├── schema.ts      # Player data models
+│   │   ├── functions.ts   # Profile queries/mutations
+│   │   ├── templates.ts   # Profile engine templates
+│   │   └── index.ts       # Feature exports
+│   ├── combat/            # Combat system feature
+│   │   ├── schema.ts      # Combat/equipment schemas
+│   │   ├── functions.ts   # Combat logic
+│   │   ├── templates.ts   # Combat encounter templates
+│   │   └── index.ts
+│   └── quests/            # Quest system feature
+│       └── ...
+├── engine/                # Cross-cutting template framework
+│   ├── types.ts           # Core template types
+│   └── core.ts            # Template execution engine
+├── schema.ts              # Aggregates all feature schemas
+└── _generated/            # Convex generated files
+```
 
-**Convex Functions** (Core Business Logic):
-- `explore()` - Generate random encounters for players
-- `getPlayerData()` - Unified player data retrieval
-- All game mechanics, data validation, and state management handled here
+**Key Collections**:
+- `players` - User profiles, progress, inventory (profile feature)
+- `encounters` - Dynamic encounter definitions and outcomes (combat/quest features)
+- `guilds` - Server-specific settings (guild feature)
+
+**Architecture Benefits**:
+- **Cohesion**: Related code (schema, functions, templates) lives together
+- **Independence**: Features can evolve without affecting others
+- **Scalability**: New features added without file sprawl
+- **Clarity**: Easy navigation - profile code is in `features/profile/`
 
 
 ## Data Flow Architecture

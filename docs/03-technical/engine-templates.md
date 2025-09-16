@@ -10,6 +10,35 @@
 
 This creates a **100% backend-supported framework** where feature flows are completely type-safe and automatically validated.
 
+## Vertical Slice Organization
+
+Each feature is organized as a complete vertical slice containing all related code:
+
+```
+features/
+├── chest/                  # Chest encounter feature
+│   ├── schema.ts          # Chest/loot data schemas
+│   ├── functions.ts       # Chest-related queries/mutations
+│   ├── templates.ts       # Chest template definitions
+│   └── index.ts           # Feature exports
+├── combat/                # Combat encounter feature
+│   ├── schema.ts          # Combat/equipment schemas
+│   ├── functions.ts       # Combat logic
+│   ├── templates.ts       # Combat templates
+│   └── index.ts
+└── profile/               # Player profile feature
+    ├── schema.ts          # Player data schema
+    ├── functions.ts       # Profile queries/mutations
+    ├── templates.ts       # Profile templates
+    └── index.ts
+```
+
+**Benefits of Vertical Slices:**
+- **Cohesion**: All chest-related code lives in `features/chest/`
+- **Independence**: Features can evolve without affecting others
+- **Clarity**: Easy to find and modify feature-specific logic
+- **Scalability**: Add new features without file sprawl
+
 ## Feature Template Set Definition
 
 ```typescript
@@ -31,9 +60,9 @@ export type FeatureTemplateSet<TTemplateIds, TActionIds> = {
 
 ## Example: Chest Feature Template Set
 
-**Feature Template Set Definition** (`features/chest-feature.ts`):
+**Feature Template Set Definition** (`features/chest/templates.ts`):
 ```typescript
-import { api } from "../convex/_generated/api";
+import { api } from "../../_generated/api";
 
 // Define all template IDs as enum
 export enum ChestTemplateId {
@@ -73,11 +102,11 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
       actions: {
         [ChestActionId.EXAMINE]: {
           label: "Examine Closely",
-          execute: api.features.chest.examineChest
+          execute: api.chest.functions.examineChest
         },
         [ChestActionId.FORCE_OPEN]: {
           label: "Force Open",
-          execute: api.features.chest.forceOpenChest
+          execute: api.chest.functions.forceOpenChest
         },
         [ChestActionId.LEAVE]: {
           label: "Walk Away",
@@ -87,15 +116,15 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
     },
 
     [ChestTemplateId.CHEST_EXAMINED]: {
-      content: api.features.chest.getExamineResults,
+      content: api.chest.functions.getExamineResults,
       actions: {
         [ChestActionId.DISARM]: {
           label: "Disarm Trap",
-          execute: api.features.chest.disarmTrap
+          execute: api.chest.functions.disarmTrap
         },
         [ChestActionId.TRIGGER]: {
           label: "Trigger Trap",
-          execute: api.features.chest.triggerTrap
+          execute: api.chest.functions.triggerTrap
         },
         [ChestActionId.STEP_BACK]: {
           label: "Step Back",
@@ -105,19 +134,19 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
     },
 
     [ChestTemplateId.LOOT_SELECTION]: {
-      content: api.features.chest.getLootOptions,
+      content: api.chest.functions.getLootOptions,
       actions: {
         [ChestActionId.TAKE_ITEM]: {
           label: "Take Item",
-          execute: api.features.chest.takeSpecificItem
+          execute: api.chest.functions.takeSpecificItem
         },
         [ChestActionId.TAKE_COINS]: {
           label: "Take Coins",
-          execute: api.features.chest.takeCoins
+          execute: api.chest.functions.takeCoins
         },
         [ChestActionId.TAKE_ALL]: {
           label: "Take Everything",
-          execute: api.features.chest.takeAllItems
+          execute: api.chest.functions.takeAllItems
         },
         [ChestActionId.DONE]: {
           label: "Done",
@@ -139,11 +168,11 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
 
 ## Convex Functions (Backend Logic)
 
-**Convex Implementation** (`convex/encounters/chest.ts`):
+**Convex Implementation** (`features/chest/functions.ts`):
 ```typescript
-import { mutation, query } from "convex/_generated/server";
+import { mutation, query } from "../../_generated/server";
 import { v } from "convex/values";
-import { ChestTemplateId } from "../features/chest-feature";
+import { ChestTemplateId } from "./templates";
 
 // Action functions return enum values or null for completion
 export const examineChest = mutation({

@@ -1,0 +1,128 @@
+import { query, mutation } from "../../_generated/server";
+import { zCustomQuery, zCustomMutation } from "convex-helpers/server/zod";
+import { NoOp } from "convex-helpers/server/customFunctions";
+import { z } from "zod";
+import { PlayerSchema } from "./schema";
+
+const zQuery = zCustomQuery(query, NoOp);
+const zMutation = zCustomMutation(mutation, NoOp);
+
+// Create player with display name (for testing and explicit creation)
+export const createPlayer = zMutation({
+  args: {
+    userId: z.string(),
+    displayName: z.string()
+  },
+  handler: async (ctx, { userId, displayName }) => {
+    // Create new player using Zod schema for validation
+    const playerData = PlayerSchema.parse({
+      userId,
+      displayName,
+      createdAt: Date.now(),
+      lastActive: Date.now(),
+      xp: 0,
+      level: 1,
+      titles: [],
+      currentTitle: undefined,
+    });
+
+    const playerId = await ctx.db.insert("players", playerData);
+    return await ctx.db.get(playerId);
+  }
+});
+
+// Create player if not exists (mutation)
+export const ensurePlayerExists = zMutation({
+  args: { userId: z.string() },
+  handler: async (ctx, { userId }) => {
+    const existing = await ctx.db
+      .query("players")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .first();
+
+    if (existing) {
+      return existing;
+    }
+
+    // Create new player using Zod schema for validation
+    const playerData = PlayerSchema.parse({
+      userId,
+      displayName: "Unknown Player",
+      createdAt: Date.now(),
+      lastActive: Date.now(),
+      xp: 0,
+      level: 1,
+      titles: [],
+      currentTitle: undefined,
+    });
+
+    const playerId = await ctx.db.insert("players", playerData);
+    return await ctx.db.get(playerId);
+  }
+});
+
+// Profile content for template display (query only)
+export const getPlayerProfileContent = zQuery({
+  args: { userId: z.string() },
+  handler: async (ctx, { userId }) => {
+    const player = await ctx.db
+      .query("players")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .first();
+
+    if (!player) {
+      // In engine context, we need to create player via mutation
+      // This is a limitation - queries can't call mutations
+      // For testing, we'll handle this in the test setup
+      throw new Error(`Player ${userId} not found - must be created first`);
+    }
+
+    return formatProfileContent(player);
+  }
+});
+
+// Engine helper function to get profile content
+export async function getPlayerProfileContentHelper(ctx: any, { userId }: { userId: string }) {
+  const player = await ctx.db
+    .query("players")
+    .withIndex("userId", (q) => q.eq("userId", userId))
+    .first();
+
+  if (!player) {
+    throw new Error(`Player ${userId} not found - must be created first`);
+  }
+
+  return formatProfileContent(player);
+}
+
+// Helper function to calculate and return raw profile data - exported for engine use
+export function formatProfileContent(player: any) {
+  // Calculate level from XP (simple formula for now)
+  const calculatedLevel = Math.floor(player.xp / 100) + 1;
+
+  // Calculate XP to next level
+  const currentLevelXP = (calculatedLevel - 1) * 100;
+  const nextLevelXP = calculatedLevel * 100;
+  const xpProgress = player.xp - currentLevelXP;
+  const xpRequired = nextLevelXP - currentLevelXP;
+
+  // Return raw data - UI handles formatting
+  return {
+    // Player identity
+    displayName: player.displayName,
+
+    // Progression data
+    level: calculatedLevel,
+    xp: player.xp,
+    xpProgress,
+    xpRequired,
+
+    // Achievement data
+    titles: player.titles,
+    currentTitle: player.currentTitle,
+
+    // Account data
+    createdAt: player.createdAt,
+    lastActive: player.lastActive,
+  };
+}
