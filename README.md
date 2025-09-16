@@ -13,6 +13,34 @@ pnpm dev
 
 # Run tests
 pnpm test
+
+# Build all apps
+pnpm build
+
+# Type check all apps
+pnpm type-check
+```
+
+## Turborepo Commands
+
+This project uses Turborepo for efficient monorepo management:
+
+```bash
+# Run a specific app in development
+pnpm --filter convex-backend dev
+pnpm --filter discord-bot dev
+pnpm --filter web dev
+
+# Build specific apps
+pnpm --filter convex-backend build
+pnpm --filter discord-bot build
+pnpm --filter web build
+
+# Run tests for specific apps
+pnpm --filter convex-backend test
+
+# Clean all build artifacts
+pnpm clean
 ```
 
 ## Monorepo Structure

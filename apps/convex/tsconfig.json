@@ -1,13 +1,26 @@
 {
-  "extends": "@convex-dev/tsconfig",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022"],
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "strict": true
+    "noEmit": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "convex/**/*",
     "*.ts",
     "*.mts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }
