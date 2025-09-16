@@ -34,8 +34,11 @@ export const createPlayer = zMutation({
       .first();
 
     if (existing) {
-      // Update display name and return
-      await ctx.db.patch(existing._id, { displayName });
+      // Update display name and lastActive, then return
+      await ctx.db.patch(existing._id, {
+        displayName,
+        lastActive: Date.now()
+      });
       return await ctx.db.get(existing._id);
     }
 
@@ -43,8 +46,12 @@ export const createPlayer = zMutation({
     const playerData = PlayerSchema.parse({
       userId,
       displayName,
+      createdAt: Date.now(),
+      lastActive: Date.now(),
       xp: 0,
       level: 1,
+      titles: [],
+      currentTitle: undefined,
     });
 
     const playerId = await ctx.db.insert("players", playerData);
