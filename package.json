@@ -1,0 +1,17 @@
+{
+  "name": "thunderclap-quest",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "clean": "turbo clean",
+    "type-check": "turbo type-check"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.6"
+  },
+  "packageManager": "pnpm@^9.15.0"
+}

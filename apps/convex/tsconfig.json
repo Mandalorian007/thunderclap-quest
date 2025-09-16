@@ -1,0 +1,13 @@
+{
+  "extends": "@convex-dev/tsconfig",
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "strict": true
+  },
+  "include": [
+    "convex/**/*",
+    "*.ts",
+    "*.mts"
+  ]
+}
