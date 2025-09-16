@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { zCustomQuery, zCustomMutation } from "convex-helpers/server/zod";
 import { NoOp } from "convex-helpers/server/customFunctions";
-import { v } from "convex/values";
 import { z } from "zod";
 import { PlayerSchema } from "./schemas/player";
 
