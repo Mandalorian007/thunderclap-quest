@@ -1,6 +1,6 @@
-# Thunderclap Quest
+# ⚔️✨ Thunderclap Quest
 
-A Discord RPG bot that delivers lightweight, choice-driven adventures through interactive encounters.
+A Discord RPG blending Path of Exile-style progression with whimsical encounters. Level up by debating butterflies, solving magic door riddles, and trading gossip with mysterious merchants!
 
 ## Quick Start
 
@@ -54,11 +54,12 @@ apps/
 
 ## Project Overview
 
-Thunderclap Quest is a Discord-native RPG experience focused on:
-- **Meaningful player choices** in every encounter
-- **Immediate engagement** with rich flavor text and contextual options
+Thunderclap Quest is a Discord-native action RPG experience featuring:
+- **Progressive leveling** with exponential XP curves and catch-up mechanics
+- **Loot systems** inspired by Path of Exile and Diablo
+- **Strategic combat encounters** with meaningful character progression
+- **Whimsical storytelling** that blends humor with traditional RPG mechanics
 - **Cross-platform progression** between Discord bot and web interface
-- **Type-safe encounter system** using advanced template frameworks
 
 ## Architecture
 
