@@ -1,0 +1,41 @@
+// Define implemented puzzle template IDs as enum
+export enum PuzzleTemplateId {
+  // Traditional puzzles with personality (implemented)
+  PICKY_MAGIC_DOOR = "PICKY_MAGIC_DOOR",
+  ENCHANTED_NUMBER_STONES = "ENCHANTED_NUMBER_STONES",
+  MIRROR_RIDDLE_GUARDIAN = "MIRROR_RIDDLE_GUARDIAN",
+
+  // Response templates
+  PUZZLE_SUCCESS = "PUZZLE_SUCCESS",
+  PUZZLE_CREATIVE = "PUZZLE_CREATIVE",
+  PUZZLE_FAILURE = "PUZZLE_FAILURE"
+}
+
+// Define all puzzle action IDs as enum
+export enum PuzzleActionId {
+  // Door actions
+  ANSWER_WORM = "ANSWER_WORM",
+  ANSWER_CREATIVELY = "ANSWER_CREATIVELY",
+  ASK_FOR_HINT = "ASK_FOR_HINT",
+  TRY_TO_FORCE = "TRY_TO_FORCE",
+
+  // Number stones actions
+  PRESS_SIX = "PRESS_SIX",
+  PRESS_EIGHT = "PRESS_EIGHT",
+  PRESS_RANDOM = "PRESS_RANDOM",
+  ASK_PATTERN = "ASK_PATTERN",
+
+  // Mirror actions
+  ANSWER_KEYBOARD = "ANSWER_KEYBOARD",
+  MAKE_WILD_GUESS = "MAKE_WILD_GUESS",
+  ASK_FOR_CLUE = "ASK_FOR_CLUE",
+  COMPLIMENT_MIRROR = "COMPLIMENT_MIRROR",
+
+  // Lock actions
+  TRY_COMBINATION = "TRY_COMBINATION",
+  LISTEN_TO_CLICKS = "LISTEN_TO_CLICKS",
+  TALK_TO_LOCK = "TALK_TO_LOCK",
+
+  // Universal
+  WALK_AWAY = "WALK_AWAY"
+}

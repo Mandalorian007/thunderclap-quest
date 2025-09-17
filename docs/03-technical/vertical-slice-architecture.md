@@ -119,7 +119,7 @@ export const profileFeatureTemplateSet: FeatureTemplateSet<ProfileTemplateId, Pr
   templates: {
     [ProfileTemplateId.PROFILE_DISPLAY]: {
       content: getPlayerProfileContentHelper,
-      actions: {} as Record<ProfileActionId, any>
+      actions: [] // Empty array = terminal template
     }
   }
 };

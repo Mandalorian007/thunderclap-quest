@@ -67,7 +67,7 @@ async function handleButtonInteraction(interaction: any) {
     }
 
     // Defer the interaction to prevent timeout
-    await interaction.deferUpdate();
+    await interaction.deferReply();
 
     // Execute the template action
     const convex = interaction.client.convex;
@@ -79,7 +79,7 @@ async function handleButtonInteraction(interaction: any) {
       interaction
     );
 
-    // Update the original interaction with new content
+    // Send new message with the response
     await interaction.editReply(response);
 
   } catch (error) {

@@ -99,28 +99,32 @@ export const socialFeatureTemplateSet: FeatureTemplateSet<SocialTemplateId, Soci
         character: { name: "Bobo the Entertainer", emoji: "🎭" },
         dialogue: "Why don't skeletons fight each other? They don't have the guts! *slaps knee*"
       },
-      actions: {
-        [SocialActionId.LAUGH_AT_JOKE]: {
+      actions: [
+        {
+          id: SocialActionId.LAUGH_AT_JOKE,
           label: "Laugh Heartily",
           emoji: "😂",
           execute: api.social.functions.laughAtJoke
         },
-        [SocialActionId.GROAN_AT_JOKE]: {
+        {
+          id: SocialActionId.GROAN_AT_JOKE,
           label: "Groan Dramatically",
           emoji: "🙄",
           execute: api.social.functions.groanAtJoke
         },
-        [SocialActionId.TELL_JOKE]: {
+        {
+          id: SocialActionId.TELL_JOKE,
           label: "Tell Your Own Joke",
           emoji: "🎪",
           execute: api.social.functions.tellJoke
         },
-        [SocialActionId.WALK_AWAY]: {
+        {
+          id: SocialActionId.WALK_AWAY,
           label: "Walk Away",
           emoji: "🚶",
           execute: null // End encounter
         }
-      }
+      ]
     },
 
     [SocialTemplateId.RIDDLER_ENCOUNTER]: {
@@ -130,28 +134,32 @@ export const socialFeatureTemplateSet: FeatureTemplateSet<SocialTemplateId, Soci
         character: { name: "Sage Puzzleton", emoji: "🧙" },
         dialogue: "I speak without a mouth and hear without ears. Have no body, but come alive with the wind. What am I?"
       },
-      actions: {
-        [SocialActionId.THINK_ABOUT_RIDDLE]: {
+      actions: [
+        {
+          id: SocialActionId.THINK_ABOUT_RIDDLE,
           label: "Think Carefully",
           emoji: "🤔",
           execute: api.social.functions.thinkAboutRiddle
         },
-        [SocialActionId.GIVE_UP_ON_RIDDLE]: {
+        {
+          id: SocialActionId.GIVE_UP_ON_RIDDLE,
           label: "That's Too Hard!",
           emoji: "😤",
           execute: api.social.functions.giveUpOnRiddle
         },
-        [SocialActionId.ANSWER_RIDDLE]: {
+        {
+          id: SocialActionId.ANSWER_RIDDLE,
           label: "An Echo!",
           emoji: "💭",
           execute: api.social.functions.answerRiddle
         },
-        [SocialActionId.WALK_AWAY]: {
+        {
+          id: SocialActionId.WALK_AWAY,
           label: "Not Interested",
           emoji: "🚶",
           execute: null
         }
-      }
+      ]
     },
 
     [SocialTemplateId.GOSSIP_MERCHANT]: {
@@ -161,28 +169,32 @@ export const socialFeatureTemplateSet: FeatureTemplateSet<SocialTemplateId, Soci
         character: { name: "Gabby McTalk", emoji: "🛒" },
         dialogue: "Psst! Did you hear about the baker's daughter and the blacksmith's son? Oh, the DRAMA!"
       },
-      actions: {
-        [SocialActionId.LISTEN_TO_GOSSIP]: {
+      actions: [
+        {
+          id: SocialActionId.LISTEN_TO_GOSSIP,
           label: "Listen Intently",
           emoji: "👂",
           execute: api.social.functions.listenToGossip
         },
-        [SocialActionId.REJECT_GOSSIP]: {
+        {
+          id: SocialActionId.REJECT_GOSSIP,
           label: "Not Interested in Gossip",
           emoji: "🤐",
           execute: api.social.functions.rejectGossip
         },
-        [SocialActionId.SHARE_GOSSIP]: {
+        {
+          id: SocialActionId.SHARE_GOSSIP,
           label: "Share Your Own News",
           emoji: "🗣️",
           execute: api.social.functions.shareGossip
         },
-        [SocialActionId.WALK_AWAY]: {
+        {
+          id: SocialActionId.WALK_AWAY,
           label: "Keep Moving",
           emoji: "🚶",
           execute: null
         }
-      }
+      ]
     },
 
     // ... other encounter templates follow same pattern
@@ -202,29 +214,33 @@ export const socialFeatureTemplateSet: FeatureTemplateSet<SocialTemplateId, Soci
   dialogue: "Why don't skeletons fight each other? They don't have the guts! *slaps knee*"
 }
 
-// Template actions (Record using enum keys)
-{
-  [SocialActionId.LAUGH_AT_JOKE]: {
+// Template actions (Array using id property)
+[
+  {
+    id: SocialActionId.LAUGH_AT_JOKE,
     label: "Laugh Heartily",
     emoji: "😂",
     execute: api.social.functions.laughAtJoke
   },
-  [SocialActionId.GROAN_AT_JOKE]: {
+  {
+    id: SocialActionId.GROAN_AT_JOKE,
     label: "Groan Dramatically",
     emoji: "🙄",
     execute: api.social.functions.groanAtJoke
   },
-  [SocialActionId.TELL_JOKE]: {
+  {
+    id: SocialActionId.TELL_JOKE,
     label: "Tell Your Own Joke",
     emoji: "🎪",
     execute: api.social.functions.tellJoke
   },
-  [SocialActionId.WALK_AWAY]: {
+  {
+    id: SocialActionId.WALK_AWAY,
     label: "Walk Away",
     emoji: "🚶",
     execute: null
   }
-}
+]
 ```
 
 **Outcomes**:
@@ -269,7 +285,7 @@ export const answerRiddle = mutation({
       description: "The encounter ends on a positive note. You feel enriched by the experience.",
       character: { name: "Narrator", emoji: "✨" }
     },
-    actions: {} // No actions = encounter complete
+    actions: [] // No actions = encounter complete
   },
 
   [SocialTemplateId.SOCIAL_FAILURE]: {
@@ -278,7 +294,7 @@ export const answerRiddle = mutation({
       description: "Well, that didn't go as planned. You learn from the experience anyway.",
       character: { name: "Narrator", emoji: "😅" }
     },
-    actions: {} // No actions = encounter complete
+    actions: [] // No actions = encounter complete
   }
 }
 ```
@@ -361,28 +377,32 @@ export enum DiscoveryActionId {
 }
 
 // Template actions
-{
-  [DiscoveryActionId.EAVESDROP_ON_BUTTERFLIES]: {
+[
+  {
+    id: DiscoveryActionId.EAVESDROP_ON_BUTTERFLIES,
     label: "Eavesdrop Quietly",
     emoji: "👂",
     execute: api.discovery.functions.eavesdropOnButterflies
   },
-  [DiscoveryActionId.JOIN_BUTTERFLY_DEBATE]: {
+  {
+    id: DiscoveryActionId.JOIN_BUTTERFLY_DEBATE,
     label: "Join the Debate",
     emoji: "🗣️",
     execute: api.discovery.functions.joinButterflyDebate
   },
-  [DiscoveryActionId.MEDIATE_BUTTERFLY_DISPUTE]: {
+  {
+    id: DiscoveryActionId.MEDIATE_BUTTERFLY_DISPUTE,
     label: "Offer to Mediate",
     emoji: "⚖️",
     execute: api.discovery.functions.mediateButterflyDispute
   },
-  [DiscoveryActionId.WALK_AWAY]: {
+  {
+    id: DiscoveryActionId.WALK_AWAY,
     label: "Quietly Back Away",
     emoji: "🚶",
     execute: null
   }
-}
+]
 ```
 
 **Outcomes**:
@@ -401,28 +421,32 @@ export enum DiscoveryActionId {
 }
 
 // Template actions
-{
-  [DiscoveryActionId.STICK_HAND_IN_PUDDLE]: {
+[
+  {
+    id: DiscoveryActionId.STICK_HAND_IN_PUDDLE,
     label: "Stick Hand In",
     emoji: "✋",
     execute: api.discovery.functions.stickHandInPuddle
   },
-  [DiscoveryActionId.DROP_COIN_IN_PUDDLE]: {
+  {
+    id: DiscoveryActionId.DROP_COIN_IN_PUDDLE,
     label: "Drop a Coin In",
     emoji: "🪙",
     execute: api.discovery.functions.dropCoinInPuddle
   },
-  [DiscoveryActionId.DRINK_FROM_PUDDLE]: {
+  {
+    id: DiscoveryActionId.DRINK_FROM_PUDDLE,
     label: "Take a Sip",
     emoji: "💧",
     execute: api.discovery.functions.drinkFromPuddle
   },
-  [DiscoveryActionId.WALK_AWAY]: {
+  {
+    id: DiscoveryActionId.WALK_AWAY,
     label: "Too Weird for Me",
     emoji: "🚶",
     execute: null
   }
-}
+]
 ```
 
 **Outcomes**:
@@ -441,28 +465,32 @@ export enum DiscoveryActionId {
 }
 
 // Template actions
-{
-  [DiscoveryActionId.KNOCK_ON_BOOK_DOOR]: {
+[
+  {
+    id: DiscoveryActionId.KNOCK_ON_BOOK_DOOR,
     label: "Knock Politely",
     emoji: "🚪",
     execute: api.discovery.functions.knockOnBookDoor
   },
-  [DiscoveryActionId.READ_THE_WALLS]: {
+  {
+    id: DiscoveryActionId.READ_THE_WALLS,
     label: "Read the Walls",
     emoji: "📖",
     execute: api.discovery.functions.readTheWalls
   },
-  [DiscoveryActionId.BORROW_A_BOOK]: {
+  {
+    id: DiscoveryActionId.BORROW_A_BOOK,
     label: "Try to Borrow a Book",
     emoji: "📚",
     execute: api.discovery.functions.borrowABook
   },
-  [DiscoveryActionId.WALK_AWAY]: {
+  {
+    id: DiscoveryActionId.WALK_AWAY,
     label: "Leave It in Peace",
     emoji: "🚶",
     execute: null
   }
-}
+]
 ```
 
 **Outcomes**:
@@ -552,33 +580,38 @@ export enum PuzzleActionId {
 }
 
 // Template actions
-{
-  [PuzzleActionId.ANSWER_WORM]: {
+[
+  {
+    id: PuzzleActionId.ANSWER_WORM,
     label: "Answer: Worm",
     emoji: "🪱",
     execute: api.puzzle.functions.answerWorm
   },
-  [PuzzleActionId.ANSWER_CREATIVELY]: {
+  {
+    id: PuzzleActionId.ANSWER_CREATIVELY,
     label: "Answer: Bus!",
     emoji: "🚌",
     execute: api.puzzle.functions.answerCreatively
   },
-  [PuzzleActionId.ASK_FOR_HINT]: {
+  {
+    id: PuzzleActionId.ASK_FOR_HINT,
     label: "Ask for a Hint",
     emoji: "💡",
     execute: api.puzzle.functions.askForHint
   },
-  [PuzzleActionId.TRY_TO_FORCE]: {
+  {
+    id: PuzzleActionId.TRY_TO_FORCE,
     label: "Try to Force It Open",
     emoji: "💪",
     execute: api.puzzle.functions.tryToForce
   },
-  [PuzzleActionId.WALK_AWAY]: {
+  {
+    id: PuzzleActionId.WALK_AWAY,
     label: "Not Worth It",
     emoji: "🚶",
     execute: null
   }
-}
+]
 ```
 
 **Outcomes**:
@@ -604,33 +637,38 @@ export enum PuzzleActionId {
 }
 
 // Template actions
-{
-  [PuzzleActionId.PRESS_SIX]: {
+[
+  {
+    id: PuzzleActionId.PRESS_SIX,
     label: "Press 6",
     emoji: "6️⃣",
     execute: api.puzzle.functions.pressSix
   },
-  [PuzzleActionId.PRESS_EIGHT]: {
+  {
+    id: PuzzleActionId.PRESS_EIGHT,
     label: "Press 8",
     emoji: "8️⃣",
     execute: api.puzzle.functions.pressEight
   },
-  [PuzzleActionId.PRESS_RANDOM]: {
+  {
+    id: PuzzleActionId.PRESS_RANDOM,
     label: "Press 42",
     emoji: "🎲",
     execute: api.puzzle.functions.pressRandom
   },
-  [PuzzleActionId.ASK_PATTERN]: {
+  {
+    id: PuzzleActionId.ASK_PATTERN,
     label: "Ask What Pattern",
     emoji: "❓",
     execute: api.puzzle.functions.askPattern
   },
-  [PuzzleActionId.WALK_AWAY]: {
+  {
+    id: PuzzleActionId.WALK_AWAY,
     label: "Math is Hard",
     emoji: "🚶",
     execute: null
   }
-}
+]
 ```
 
 **Outcomes**:
@@ -657,33 +695,38 @@ export enum PuzzleActionId {
 }
 
 // Template actions
-{
-  [PuzzleActionId.ANSWER_KEYBOARD]: {
+[
+  {
+    id: PuzzleActionId.ANSWER_KEYBOARD,
     label: "Answer: Keyboard",
     emoji: "⌨️",
     execute: api.puzzle.functions.answerKeyboard
   },
-  [PuzzleActionId.MAKE_WILD_GUESS]: {
+  {
+    id: PuzzleActionId.MAKE_WILD_GUESS,
     label: "Answer: A Sandwich!",
     emoji: "🥪",
     execute: api.puzzle.functions.makeWildGuess
   },
-  [PuzzleActionId.ASK_FOR_CLUE]: {
+  {
+    id: PuzzleActionId.ASK_FOR_CLUE,
     label: "Ask for a Clue",
     emoji: "🔍",
     execute: api.puzzle.functions.askForClue
   },
-  [PuzzleActionId.COMPLIMENT_MIRROR]: {
+  {
+    id: PuzzleActionId.COMPLIMENT_MIRROR,
     label: "Compliment the Mirror",
     emoji: "🌟",
     execute: api.puzzle.functions.complimentMirror
   },
-  [PuzzleActionId.WALK_AWAY]: {
+  {
+    id: PuzzleActionId.WALK_AWAY,
     label: "Too Cryptic",
     emoji: "🚶",
     execute: null
   }
-}
+]
 ```
 
 **Outcomes**:

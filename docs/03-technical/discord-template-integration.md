@@ -12,7 +12,10 @@ Instead of building Discord-specific commands, Thunderclap Quest implements a **
 interface TemplateExecutionResult {
   templateId: string;
   content: any;           // Template-specific data
-  actions: TemplateAction[];  // Available player actions
+  actions: Array<{        // Available player actions (array format)
+    id: string;
+    label: string;
+  }>;
   isTerminal: boolean;    // No actions = terminal state
 }
 ```
@@ -107,7 +110,7 @@ Template actions become interactive Discord buttons:
 
 ```typescript
 function renderTemplateActions(
-  actions: TemplateAction[],
+  actions: Array<{ id: string; label: string }>,
   templateId: string,
   userId: string
 ): ButtonBuilder[] {
@@ -116,8 +119,8 @@ function renderTemplateActions(
     new ButtonBuilder()
       .setCustomId(`${templateId}:${action.id}:${userId}`)
       .setLabel(action.label)
-      .setStyle(getButtonStyle(action.style))
-      .setEmoji(action.emoji || null)
+      .setStyle(ButtonStyle.Primary)
+      .setEmoji(getActionEmoji(action.id) || null)
   );
 }
 
@@ -212,6 +215,12 @@ Bot: [New Story Embed] + [Different choices] ← executeAction("HELP_VILLAGE") �
 - Template system provides type safety for all interactions
 - Action validation handled by engine, not Discord layer
 - Consistent error handling across all features
+
+### 🔧 **Array-Based Actions Benefits**
+- Simple `.map()` operation to convert actions to Discord buttons
+- Required labels ensure every button has proper text
+- Clear empty array `[]` handling for terminal templates
+- No complex Record type iteration needed
 
 ## File Structure
 

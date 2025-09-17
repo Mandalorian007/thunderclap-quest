@@ -79,7 +79,7 @@ Template Engine Core:
 Profile Feature Template Set:
 ProfileTemplateId.PROFILE_DISPLAY -> {
   content: api.profile.functions.getPlayerProfileContent,
-  actions: {} // No actions = terminal template
+  actions: [] // Empty array = terminal template
 }
 
 getPlayerProfileContent(userId):

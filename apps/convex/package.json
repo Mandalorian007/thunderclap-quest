@@ -6,7 +6,7 @@
     "dev": "convex dev",
     "build": "convex build",
     "deploy": "convex deploy",
-    "test": "vitest",
+    "test": "vitest --run",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

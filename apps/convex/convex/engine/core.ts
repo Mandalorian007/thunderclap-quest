@@ -4,26 +4,45 @@ import { NoOp } from "convex-helpers/server/customFunctions";
 import { z } from "zod";
 import type { TemplateExecutionResult, ActionExecutionResult, FeatureTemplateSet } from "./types";
 
-// Import all features to register them
-import "../features";
+// Features will be imported and registered when needed
 
 const zQuery = zCustomQuery(query, NoOp);
 const zMutation = zCustomMutation(mutation, NoOp);
 
 // Template registry - will be populated by feature imports
-const templateRegistry: Record<string, FeatureTemplateSet<any, any>> = {};
+let templateRegistry: Record<string, FeatureTemplateSet<any, any>> = {};
+
+// Initialize registry
+function initializeRegistry() {
+  if (!templateRegistry) {
+    templateRegistry = {};
+  }
+}
 
 // Register a feature template set
 export function registerFeatureTemplateSet<TTemplateIds extends string | number | symbol, TActionIds extends string | number | symbol>(
   featureTemplateSet: FeatureTemplateSet<TTemplateIds, TActionIds>
 ): void {
+  initializeRegistry();
+
+  if (!featureTemplateSet || !featureTemplateSet.templates) {
+    console.warn('Attempted to register invalid feature template set:', featureTemplateSet);
+    return;
+  }
+
   Object.keys(featureTemplateSet.templates).forEach(templateId => {
-    templateRegistry[templateId as string] = featureTemplateSet;
+    const template = featureTemplateSet.templates[templateId as keyof typeof featureTemplateSet.templates];
+    if (template) {
+      templateRegistry[templateId as string] = featureTemplateSet;
+    } else {
+      console.warn(`Template ${templateId} is undefined in feature set`);
+    }
   });
 }
 
 // Get template by ID from registry
 function getTemplate(templateId: string) {
+  initializeRegistry();
   const featureSet = templateRegistry[templateId];
   if (!featureSet) {
     throw new Error(`Template ${templateId} not found in registry`);
@@ -70,8 +89,8 @@ export const executeTemplate = zQuery({
     }
 
     // Format actions
-    const actions = Object.entries(template.actions).map(([actionId, action]) => ({
-      id: actionId,
+    const actions = template.actions.map(action => ({
+      id: action.id,
       label: action.label
     }));
 
@@ -93,7 +112,7 @@ export const executeAction = zMutation({
   },
   handler: async (ctx, { templateId, actionId, userId }): Promise<ActionExecutionResult> => {
     const template = getTemplate(templateId);
-    const action = template.actions[actionId as keyof typeof template.actions];
+    const action = template.actions.find(a => a.id === actionId);
 
     if (!action) {
       throw new Error(`Action ${actionId} not found in template ${templateId}`);
@@ -106,7 +125,7 @@ export const executeAction = zMutation({
       // Explicit completion
       return { isComplete: true };
     } else {
-      // Dynamic routing - call the function
+      // Dynamic routing - call the zMutation function directly
       const nextTemplateId = await action.execute(ctx, { userId });
       return nextTemplateId
         ? { nextTemplateId }
@@ -119,6 +138,18 @@ export const executeAction = zMutation({
 export const getTemplateRegistry = zQuery({
   args: {},
   handler: async (ctx, {}) => {
+    initializeRegistry();
     return Object.keys(templateRegistry);
   }
 });
+
+// Register all template sets at startup to avoid circular imports
+import { profileFeatureTemplateSet } from '../features/profile/templates';
+import { socialFeatureTemplateSet } from '../features/social/templates';
+import { discoveryFeatureTemplateSet } from '../features/discovery/templates';
+import { puzzleFeatureTemplateSet } from '../features/puzzle/templates';
+
+registerFeatureTemplateSet(profileFeatureTemplateSet);
+registerFeatureTemplateSet(socialFeatureTemplateSet);
+registerFeatureTemplateSet(discoveryFeatureTemplateSet);
+registerFeatureTemplateSet(puzzleFeatureTemplateSet);

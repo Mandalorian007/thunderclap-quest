@@ -42,14 +42,19 @@ features/
 ## Feature Template Set Definition
 
 ```typescript
-import type { FunctionReference } from "convex/server";
+import type { FunctionReference, RegisteredMutation } from "convex/server";
+
+export type TemplateActionFunction = RegisteredMutation<"public", { userId: string }, Promise<string | null>>;
+
+export type EngineAction<TTemplateIds, TActionIds> = {
+  id: TActionIds;
+  label: string;
+  execute: TTemplateIds | TemplateActionFunction | FunctionReference<"mutation", "public", { userId: string }, TTemplateIds | null> | null;
+};
 
 export type EngineTemplate<TContent, TTemplateIds, TActionIds> = {
   content: TContent | FunctionReference<"query", "public", { userId: string }, TContent>;
-  actions: Record<TActionIds, {
-    label: string;
-    execute: TTemplateIds | FunctionReference<"mutation", "public", { userId: string }, TTemplateIds | null> | null;
-  }>;
+  actions: EngineAction<TTemplateIds, TActionIds>[];
 };
 
 export type FeatureTemplateSet<TTemplateIds, TActionIds> = {
@@ -99,60 +104,70 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
         isLocked: false,
         trapSuspected: true
       },
-      actions: {
-        [ChestActionId.EXAMINE]: {
+      actions: [
+        {
+          id: ChestActionId.EXAMINE,
           label: "Examine Closely",
           execute: api.chest.functions.examineChest
         },
-        [ChestActionId.FORCE_OPEN]: {
+        {
+          id: ChestActionId.FORCE_OPEN,
           label: "Force Open",
           execute: api.chest.functions.forceOpenChest
         },
-        [ChestActionId.LEAVE]: {
+        {
+          id: ChestActionId.LEAVE,
           label: "Walk Away",
           execute: null // null = encounter complete
         }
-      }
+      ]
     },
 
     [ChestTemplateId.CHEST_EXAMINED]: {
       content: api.chest.functions.getExamineResults,
-      actions: {
-        [ChestActionId.DISARM]: {
+      actions: [
+        {
+          id: ChestActionId.DISARM,
           label: "Disarm Trap",
           execute: api.chest.functions.disarmTrap
         },
-        [ChestActionId.TRIGGER]: {
+        {
+          id: ChestActionId.TRIGGER,
           label: "Trigger Trap",
           execute: api.chest.functions.triggerTrap
         },
-        [ChestActionId.STEP_BACK]: {
+        {
+          id: ChestActionId.STEP_BACK,
           label: "Step Back",
           execute: ChestTemplateId.MYSTERIOUS_CHEST // Direct enum reference
         }
-      }
+      ]
     },
 
     [ChestTemplateId.LOOT_SELECTION]: {
       content: api.chest.functions.getLootOptions,
-      actions: {
-        [ChestActionId.TAKE_ITEM]: {
+      actions: [
+        {
+          id: ChestActionId.TAKE_ITEM,
           label: "Take Item",
           execute: api.chest.functions.takeSpecificItem
         },
-        [ChestActionId.TAKE_COINS]: {
+        {
+          id: ChestActionId.TAKE_COINS,
           label: "Take Coins",
           execute: api.chest.functions.takeCoins
         },
-        [ChestActionId.TAKE_ALL]: {
+        {
+          id: ChestActionId.TAKE_ALL,
           label: "Take Everything",
           execute: api.chest.functions.takeAllItems
         },
-        [ChestActionId.DONE]: {
+        {
+          id: ChestActionId.DONE,
           label: "Done",
           execute: null // completion
         }
-      }
+      ]
     },
 
     [ChestTemplateId.ENCOUNTER_COMPLETE]: {
@@ -160,7 +175,7 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
         title: "Encounter Complete",
         description: "You continue on your journey..."
       },
-      actions: {} // No actions = terminal state
+      actions: [] // Empty array = terminal state
     }
   }
 };
@@ -325,7 +340,7 @@ export function validateFeatureTemplateSet<TTemplateIds, TActionIds>(
 
   // Check all routing targets exist and mark reachable templates
   for (const [templateId, template] of Object.entries(featureTemplateSet.templates)) {
-    for (const [actionId, action] of Object.entries(template.actions)) {
+    for (const action of template.actions) {
       if (typeof action.execute === 'string') {
         // Static routing - enum values should always be valid due to TypeScript
         reachableIds.add(action.execute);
@@ -333,7 +348,7 @@ export function validateFeatureTemplateSet<TTemplateIds, TActionIds>(
         // Explicit completion - valid
       } else {
         // Dynamic routing - TypeScript + enum return types provide compile-time safety
-        warnings.push(`Template ${templateId}, action ${actionId} uses dynamic routing - runtime validation enabled`);
+        warnings.push(`Template ${templateId}, action ${action.id} uses dynamic routing - runtime validation enabled`);
       }
     }
   }
@@ -373,7 +388,7 @@ async function handleActionClick(userId: string, buttonId: string) {
 
   // Get the template and action directly
   const template = chestFeatureTemplateSet.templates[templateId as ChestTemplateId];
-  const action = template.actions[actionId as ChestActionId];
+  const action = template.actions.find(a => a.id === actionId as ChestActionId);
 
   // Execute the action
   const result = await convex.mutation(api.features.executeAction, { action, userId });
@@ -420,9 +435,9 @@ function createDiscordEmbed(template: any, content: any) {
   });
 
   // Create buttons from template actions
-  const buttons = Object.entries(template.actions).map(([actionId, action]: [string, any]) =>
+  const buttons = template.actions.map((action: any) =>
     new ButtonBuilder()
-      .setCustomId(`${template.id || 'unknown'}:${actionId}`)
+      .setCustomId(`${template.id || 'unknown'}:${action.id}`)
       .setLabel(action.label)
       .setStyle(ButtonStyle.Primary)
   );
@@ -457,7 +472,10 @@ async function handleButtonInteraction(interaction: ButtonInteraction) {
 
  **Typed Navigation** - Compile-time validation of all routing paths
  **Mixed Execution** - Actions can be direct routes OR Convex functions
- **Reachability Validation** - Runtime checks ensure no orphaned templates
+ **Array-Based Actions** - Simple arrays instead of complex Record types eliminate `Partial` complexity
+ **Required Labels** - TypeScript enforces that every action has a label (no defensive fallbacks needed)
+ **Clear Intent** - Empty array `[]` clearly indicates terminal templates
+ **Simple Operations** - `.map()` and `.find()` instead of `Object.entries()` complexity
  **Platform Agnostic** - Same template sets work on Discord, web, mobile
  **Zero State Management** - Templates are stateless, data loads fresh
  **Encounter Isolation** - Each template set is completely self-contained

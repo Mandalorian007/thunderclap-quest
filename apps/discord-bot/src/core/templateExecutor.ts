@@ -86,13 +86,12 @@ export async function executeTemplateAction(
     const result = await convex.mutation(api.engine.core.executeAction, {
       templateId,
       actionId,
-      userId,
-      params: {} // Could extract additional params from interaction
+      userId
     });
 
     // Render the next template state
     return await executeDiscordTemplate(
-      result.nextTemplate,
+      result.nextTemplateId,
       userId,
       convex,
       interaction

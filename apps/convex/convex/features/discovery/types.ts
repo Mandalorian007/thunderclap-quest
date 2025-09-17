@@ -1,0 +1,38 @@
+// Define implemented discovery template IDs as enum
+export enum DiscoveryTemplateId {
+  // Whimsical discoveries (implemented)
+  BUTTERFLY_CONFERENCE = "BUTTERFLY_CONFERENCE",
+  UPSIDE_DOWN_PUDDLE = "UPSIDE_DOWN_PUDDLE",
+  BOOK_HOUSE = "BOOK_HOUSE",
+
+  // Response templates
+  DISCOVERY_DELIGHT = "DISCOVERY_DELIGHT",
+  DISCOVERY_WONDER = "DISCOVERY_WONDER",
+  DISCOVERY_MAGIC = "DISCOVERY_MAGIC"
+}
+
+// Define all discovery action IDs as enum
+export enum DiscoveryActionId {
+  // Butterfly conference actions
+  EAVESDROP_ON_BUTTERFLIES = "EAVESDROP_ON_BUTTERFLIES",
+  JOIN_BUTTERFLY_DEBATE = "JOIN_BUTTERFLY_DEBATE",
+  MEDIATE_BUTTERFLY_DISPUTE = "MEDIATE_BUTTERFLY_DISPUTE",
+
+  // Puddle actions
+  STICK_HAND_IN_PUDDLE = "STICK_HAND_IN_PUDDLE",
+  DROP_COIN_IN_PUDDLE = "DROP_COIN_IN_PUDDLE",
+  DRINK_FROM_PUDDLE = "DRINK_FROM_PUDDLE",
+
+  // Book house actions
+  KNOCK_ON_BOOK_DOOR = "KNOCK_ON_BOOK_DOOR",
+  READ_THE_WALLS = "READ_THE_WALLS",
+  BORROW_A_BOOK = "BORROW_A_BOOK",
+
+  // Tree actions
+  TOUCH_UPSIDE_ROOTS = "TOUCH_UPSIDE_ROOTS",
+  DIG_BURIED_BRANCHES = "DIG_BURIED_BRANCHES",
+  SIT_AND_CONTEMPLATE = "SIT_AND_CONTEMPLATE",
+
+  // Universal
+  WALK_AWAY = "WALK_AWAY"
+}

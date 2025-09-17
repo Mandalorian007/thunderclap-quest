@@ -18,7 +18,7 @@ export const profileFeatureTemplateSet: FeatureTemplateSet<ProfileTemplateId, Pr
   templates: {
     [ProfileTemplateId.PROFILE_DISPLAY]: {
       content: getPlayerProfileContentHelper,
-      actions: {} as Record<ProfileActionId, any> // No actions = terminal template
+      actions: [] // Empty array = terminal template
     }
   }
 };
