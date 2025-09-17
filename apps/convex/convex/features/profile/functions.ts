@@ -37,7 +37,7 @@ export const ensurePlayerExists = zMutation({
   handler: async (ctx, { userId }) => {
     const existing = await ctx.db
       .query("players")
-      .withIndex("userId", (q) => q.eq("userId", userId))
+      .withIndex("userId", (q: any) => q.eq("userId", userId))
       .first();
 
     if (existing) {
@@ -67,7 +67,7 @@ export const getPlayerProfileContent = zQuery({
   handler: async (ctx, { userId }) => {
     const player = await ctx.db
       .query("players")
-      .withIndex("userId", (q) => q.eq("userId", userId))
+      .withIndex("userId", (q: any) => q.eq("userId", userId))
       .first();
 
     if (!player) {
@@ -85,7 +85,7 @@ export const getPlayerProfileContent = zQuery({
 export async function getPlayerProfileContentHelper(ctx: any, { userId }: { userId: string }) {
   const player = await ctx.db
     .query("players")
-    .withIndex("userId", (q) => q.eq("userId", userId))
+    .withIndex("userId", (q: any) => q.eq("userId", userId))
     .first();
 
   if (!player) {
