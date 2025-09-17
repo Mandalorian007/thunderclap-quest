@@ -36,7 +36,7 @@ loadCommands(client);
 setupInteractionHandlers(client);
 
 // Bot ready event
-client.once('ready', () => {
+client.once('clientReady', () => {
   console.log(`🚀 Thunderclap Quest bot logged in as ${client.user?.tag}`);
   console.log(`🎮 Template engine integration active`);
   console.log(`🔗 Connected to Convex: ${process.env.CONVEX_URL}`);

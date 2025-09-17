@@ -82,6 +82,17 @@ async function handleButtonInteraction(interaction: any) {
     // Send new message with the response
     await interaction.editReply(response);
 
+    // Update the original message to remove action buttons to prevent farming
+    try {
+      await interaction.message.edit({
+        embeds: interaction.message.embeds,
+        components: [] // Remove all action buttons
+      });
+    } catch (editError) {
+      console.error('Failed to update original message:', editError);
+      // Non-critical error, continue execution
+    }
+
   } catch (error) {
     console.error('Button interaction error:', error);
 

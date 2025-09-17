@@ -135,7 +135,7 @@ describe("Profile Functions", () => {
       expect(content.xpRequired).toBe(100);
     });
 
-    test("calculates level 2 for 100-199 XP", () => {
+    test("calculates level 2 for 150 XP (exponential system)", () => {
       const player = {
         displayName: "Test",
         xp: 150,
@@ -148,10 +148,10 @@ describe("Profile Functions", () => {
       const content = formatProfileContent(player);
       expect(content.level).toBe(2);
       expect(content.xpProgress).toBe(50); // 150 - 100 (level 2 start)
-      expect(content.xpRequired).toBe(100); // 200 - 100 (level range)
+      expect(content.xpRequired).toBe(114); // Level 2 requires 114 XP (exponential)
     });
 
-    test("calculates level 5 for 450 XP", () => {
+    test("calculates level 4 for 450 XP (exponential system)", () => {
       const player = {
         displayName: "Test",
         xp: 450,
@@ -162,9 +162,9 @@ describe("Profile Functions", () => {
       };
 
       const content = formatProfileContent(player);
-      expect(content.level).toBe(5);
-      expect(content.xpProgress).toBe(50); // 450 - 400 (level 5 start)
-      expect(content.xpRequired).toBe(100); // 500 - 400 (level range)
+      expect(content.level).toBe(4);
+      expect(content.xpProgress).toBe(104); // 450 - 346 (level 4 start)
+      expect(content.xpRequired).toBe(152); // Level 5 requires 152 XP (exponential)
     });
 
     test("handles titles correctly", () => {

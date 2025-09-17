@@ -75,9 +75,10 @@ export const resolveTemplateContent = zQuery({
 export const executeTemplate = zQuery({
   args: {
     templateId: z.string(),
-    userId: z.string()
+    userId: z.string(),
+    rewards: z.any().optional() // Optional rewards to include in content
   },
-  handler: async (ctx, { templateId, userId }): Promise<TemplateExecutionResult> => {
+  handler: async (ctx, { templateId, userId, rewards }): Promise<TemplateExecutionResult> => {
     const template = getTemplate(templateId);
 
     // Resolve content
@@ -86,6 +87,14 @@ export const executeTemplate = zQuery({
       content = await template.content(ctx, { userId });
     } else {
       content = template.content;
+    }
+
+    // Add rewards to content if provided
+    if (rewards) {
+      content = {
+        ...content,
+        rewards
+      };
     }
 
     // Format actions
@@ -126,9 +135,20 @@ export const executeAction = zMutation({
       return { isComplete: true };
     } else {
       // Dynamic routing - call the zMutation function directly
-      const nextTemplateId = await action.execute(ctx, { userId });
-      return nextTemplateId
-        ? { nextTemplateId }
+      const result = await action.execute(ctx, { userId });
+
+      // Handle ActionResult with rewards
+      if (result && typeof result === 'object' && 'nextTemplateId' in result) {
+        return {
+          nextTemplateId: result.nextTemplateId,
+          isComplete: !result.nextTemplateId,
+          rewards: result.rewards
+        };
+      }
+
+      // Handle legacy string/null result
+      return result
+        ? { nextTemplateId: result as string }
         : { isComplete: true };
     }
   }

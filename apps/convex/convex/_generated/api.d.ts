@@ -30,6 +30,9 @@ import type * as features_profile_index from "../features/profile/index.js";
 import type * as features_profile_templates from "../features/profile/templates.js";
 import type * as features_profile_types from "../features/profile/types.js";
 import type * as features_profile from "../features/profile.js";
+import type * as features_progression_functions from "../features/progression/functions.js";
+import type * as features_progression_index from "../features/progression/index.js";
+import type * as features_progression_types from "../features/progression/types.js";
 import type * as features_puzzle_functions from "../features/puzzle/functions.js";
 import type * as features_puzzle_index from "../features/puzzle/index.js";
 import type * as features_puzzle_templates from "../features/puzzle/templates.js";
@@ -40,6 +43,7 @@ import type * as features_social_index from "../features/social/index.js";
 import type * as features_social_templates from "../features/social/templates.js";
 import type * as features_social_types from "../features/social/types.js";
 import type * as features_social from "../features/social.js";
+import type * as shared_rewards from "../shared/rewards.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -67,6 +71,9 @@ declare const fullApi: ApiFromModules<{
   "features/profile/templates": typeof features_profile_templates;
   "features/profile/types": typeof features_profile_types;
   "features/profile": typeof features_profile;
+  "features/progression/functions": typeof features_progression_functions;
+  "features/progression/index": typeof features_progression_index;
+  "features/progression/types": typeof features_progression_types;
   "features/puzzle/functions": typeof features_puzzle_functions;
   "features/puzzle/index": typeof features_puzzle_index;
   "features/puzzle/templates": typeof features_puzzle_templates;
@@ -77,6 +84,7 @@ declare const fullApi: ApiFromModules<{
   "features/social/templates": typeof features_social_templates;
   "features/social/types": typeof features_social_types;
   "features/social": typeof features_social;
+  "shared/rewards": typeof shared_rewards;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

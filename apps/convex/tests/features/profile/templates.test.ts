@@ -74,19 +74,44 @@ describe("Profile Templates", () => {
       // Mock context and parameters
       const mockCtx = {
         db: {
-          query: () => ({
+          query: (table: string) => ({
             withIndex: () => ({
-              first: () => Promise.resolve({
-                userId: "test",
-                displayName: "Test",
-                xp: 100,
-                level: 2,
-                titles: [],
-                currentTitle: undefined,
-                createdAt: Date.now(),
-                lastActive: Date.now()
-              })
-            })
+              first: () => {
+                if (table === "players") {
+                  return Promise.resolve({
+                    userId: "test",
+                    displayName: "Test",
+                    xp: 100,
+                    level: 2,
+                    titles: [],
+                    currentTitle: undefined,
+                    createdAt: Date.now(),
+                    lastActive: Date.now()
+                  });
+                } else if (table === "gameLevels") {
+                  return Promise.resolve({
+                    level: 10,
+                    lastIncrease: Date.now(),
+                    nextIncrease: Date.now() + 14 * 24 * 60 * 60 * 1000,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                  });
+                }
+                return Promise.resolve(null);
+              }
+            }),
+            first: () => {
+              if (table === "gameLevels") {
+                return Promise.resolve({
+                  level: 10,
+                  lastIncrease: Date.now(),
+                  nextIncrease: Date.now() + 14 * 24 * 60 * 60 * 1000,
+                  createdAt: Date.now(),
+                  updatedAt: Date.now()
+                });
+              }
+              return Promise.resolve(null);
+            }
           })
         }
       };
@@ -98,6 +123,8 @@ describe("Profile Templates", () => {
       expect(result).toBeDefined();
       expect(result.displayName).toBe("Test");
       expect(result.level).toBe(2);
+      expect(result.gameLevel).toBe(10);
+      expect(result.xpMultiplier).toBeDefined();
     });
   });
 });

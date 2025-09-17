@@ -46,13 +46,14 @@ features/
 
 ```typescript
 import type { FunctionReference, RegisteredMutation } from "convex/server";
+import type { ActionResult } from "../../shared/rewards";
 
-export type TemplateActionFunction = RegisteredMutation<"public", { userId: string }, Promise<string | null>>;
+export type TemplateActionFunction = RegisteredMutation<"public", { userId: string }, Promise<string | null | ActionResult>>;
 
 export type EngineAction<TTemplateIds, TActionIds> = {
   id: TActionIds;
   label: string;
-  execute: TTemplateIds | TemplateActionFunction | FunctionReference<"mutation", "public", { userId: string }, TTemplateIds | null> | null;
+  execute: TTemplateIds | TemplateActionFunction | FunctionReference<"mutation", "public", { userId: string }, TTemplateIds | null | ActionResult> | null;
 };
 
 export type EngineTemplate<TContent, TTemplateIds, TActionIds> = {
@@ -189,6 +190,90 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
     }
   }
 };
+```
+
+## Reward System Integration
+
+**Global Reward Structure** (`shared/rewards.ts`):
+```typescript
+// Core reward interfaces
+export interface RewardEntry {
+  icon: string;      // Emoji for visual display
+  amount: number;    // Quantity earned (always positive)
+  name: string;      // Human-readable name
+}
+
+export interface RewardBundle {
+  rewards: RewardEntry[];
+}
+
+export interface ActionResult {
+  nextTemplateId: string | null;
+  rewards?: RewardBundle;
+}
+
+// Reward type constants - referenceable like XP_REWARD.icon
+export const XP_REWARD = { icon: "✨", name: "Experience" } as const;
+export const TITLE_REWARD = { icon: "🏆", name: "Title" } as const;
+export const GOLD_REWARD = { icon: "🪙", name: "Gold" } as const;
+export const ITEM_REWARD = { icon: "📦", name: "Item" } as const;
+
+// Universal reward formatter
+export function formatRewardBundle(bundle: RewardBundle): string {
+  return bundle.rewards
+    .map(reward => `${reward.icon} +${reward.amount} ${reward.name}`)
+    .join('\n');
+}
+```
+
+**Smart Helper Functions** (progression system):
+```typescript
+// Smart XP helper - returns actual XP awarded (with multipliers applied)
+export async function awardXPHelper(ctx: any, userId: string, xpAmount: number, source: string): Promise<{ xpAwarded: number; /* ... */ }>
+
+// Smart title helper - returns true only if title was newly awarded, false if already had it
+export async function awardTitleHelper(ctx: any, userId: string, title: string): Promise<boolean>
+```
+
+**Action Functions with Rewards**:
+```typescript
+import { ActionResult, XP_REWARD, TITLE_REWARD } from "../../shared/rewards";
+
+export const examineChest = mutation({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }): Promise<ActionResult> => {
+    // Award XP and check for new title
+    const xpResult = await awardXPHelper(ctx, userId, 10, "chest.examine");
+    const titleAwarded = await awardTitleHelper(ctx, userId, "Keen Observer");
+
+    // Build rewards array
+    const rewards = [
+      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+    ];
+
+    // Only include title if it was actually newly awarded
+    if (titleAwarded) {
+      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Keen Observer" });
+    }
+
+    return {
+      nextTemplateId: ChestTemplateId.CHEST_EXAMINED,
+      rewards: { rewards }
+    };
+  }
+});
+```
+
+**Player Experience**:
+```
+First time examining chest:
+🎁 Rewards Earned
+✨ +18 Experience
+🏆 +1 Keen Observer
+
+Second time examining (same action):
+🎁 Rewards Earned
+✨ +18 Experience
 ```
 
 ## Convex Functions (Backend Logic)

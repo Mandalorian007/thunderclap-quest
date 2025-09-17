@@ -18,7 +18,8 @@ export async function executeDiscordTemplate(
   templateId: string,
   userId: string,
   convex: ConvexHttpClient,
-  interaction?: CommandInteraction | ButtonInteraction
+  interaction?: CommandInteraction | ButtonInteraction,
+  rewards?: any  // Optional rewards from action execution
 ): Promise<InteractionReplyOptions> {
   try {
     // Import Convex API inside function to avoid deployment issues
@@ -30,7 +31,8 @@ export async function executeDiscordTemplate(
     // Execute template via engine
     const result = await convex.query(api.engine.core.executeTemplate, {
       templateId,
-      userId
+      userId,
+      rewards  // Pass rewards to engine
     });
 
     // Convert template content to Discord embed
@@ -89,12 +91,13 @@ export async function executeTemplateAction(
       userId
     });
 
-    // Render the next template state
+    // Render the next template state with rewards
     return await executeDiscordTemplate(
       result.nextTemplateId,
       userId,
       convex,
-      interaction
+      interaction,
+      result.rewards  // Pass rewards to template
     );
 
   } catch (error) {

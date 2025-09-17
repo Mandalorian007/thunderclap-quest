@@ -1,9 +1,13 @@
 import type { FunctionReference, RegisteredMutation } from "convex/server";
+import type { RewardBundle } from "../shared/rewards";
 
 // Core engine template types following the design from docs/03-technical/engine-templates.md
 
+// Import ActionResult from shared rewards
+import type { ActionResult } from "../shared/rewards";
+
 // Define a more specific function type that matches what Convex mutations actually return
-export type TemplateActionFunction = RegisteredMutation<"public", { userId: string }, Promise<string | null>>;
+export type TemplateActionFunction = RegisteredMutation<"public", { userId: string }, Promise<string | null | ActionResult>>;
 
 export type EngineAction<TTemplateIds extends string | number | symbol, TActionIds extends string | number | symbol> = {
   id: TActionIds;
@@ -35,4 +39,5 @@ export type TemplateExecutionResult = {
 export type ActionExecutionResult = {
   nextTemplateId?: string;
   isComplete?: boolean;
+  rewards?: RewardBundle;
 };

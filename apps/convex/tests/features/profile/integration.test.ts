@@ -61,10 +61,10 @@ describe("Profile Feature Integration", () => {
 
       // 3. Verify experienced player data
       expect(profileContent.displayName).toBe(displayName);
-      expect(profileContent.level).toBe(4); // Calculated from 350 XP
+      expect(profileContent.level).toBe(4); // Calculated from 350 XP (exponential)
       expect(profileContent.xp).toBe(350);
-      expect(profileContent.xpProgress).toBe(50); // 350 - 300 (level 4 start)
-      expect(profileContent.xpRequired).toBe(100); // 400 - 300 (level range)
+      expect(profileContent.xpProgress).toBe(4); // 350 - 346 (level 4 start)
+      expect(profileContent.xpRequired).toBe(152); // Level 5 requires 152 XP (exponential)
       expect(profileContent.titles).toEqual(["First Steps", "Explorer", "Warrior"]);
       expect(profileContent.currentTitle).toBe("Warrior");
     });
@@ -190,7 +190,7 @@ describe("Profile Feature Integration", () => {
         userId
       });
 
-      expect(profileContent.level).toBe(100); // 9999 XP = level 100
+      expect(profileContent.level).toBe(20); // 9999 XP = level 20 (exponential)
       expect(profileContent.xp).toBe(9999);
       expect(profileContent.displayName).toBe("Max Level Player");
     });

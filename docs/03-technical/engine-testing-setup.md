@@ -29,6 +29,133 @@ export default defineConfig({
 }
 ```
 
+## Testing the Reward System
+
+### **ActionResult Testing**
+Test actions that return rewards by calling them directly:
+
+```typescript
+import { expect, test, describe } from "vitest";
+import { api } from "../../../convex/_generated/api";
+import { createTestInstance } from "../../helpers/test-utils";
+
+test("action returns correct rewards", async () => {
+  const t = createTestInstance();
+  const userId = "test-user";
+
+  // Create player
+  await t.mutation(api.features.profile.functions.createPlayer, {
+    userId,
+    displayName: "Test Player"
+  });
+
+  // Execute action directly to test ActionResult
+  const result = await t.mutation(api.features.social.functions.laughAtJoke, {
+    userId
+  });
+
+  // Verify ActionResult structure
+  expect(result.nextTemplateId).toBe("SOCIAL_SUCCESS");
+  expect(result.rewards).toBeDefined();
+  expect(result.rewards.rewards).toHaveLength(2); // XP + Title
+
+  // Verify reward details
+  const xpReward = result.rewards.rewards.find(r => r.icon === "✨");
+  expect(xpReward.amount).toBeGreaterThan(0);
+  expect(xpReward.name).toBe("Experience");
+
+  const titleReward = result.rewards.rewards.find(r => r.icon === "🏆");
+  expect(titleReward.amount).toBe(1);
+  expect(titleReward.name).toBe("Good Sport");
+});
+```
+
+### **Smart Helper Testing**
+Test that helpers only award when appropriate:
+
+```typescript
+test("title helper is smart about duplicates", async () => {
+  const t = createTestInstance();
+  const userId = "test-user";
+
+  await t.mutation(api.features.profile.functions.createPlayer, {
+    userId,
+    displayName: "Test Player"
+  });
+
+  // First time should award title and XP
+  const result1 = await t.mutation(api.features.social.functions.laughAtJoke, {
+    userId
+  });
+  expect(result1.rewards.rewards).toHaveLength(2);
+
+  // Second time should only award XP
+  const result2 = await t.mutation(api.features.social.functions.laughAtJoke, {
+    userId
+  });
+  expect(result2.rewards.rewards).toHaveLength(1);
+  expect(result2.rewards.rewards[0].icon).toBe("✨"); // Only XP
+});
+```
+
+### **Engine Integration Testing**
+Test that the engine passes rewards correctly:
+
+```typescript
+test("engine passes rewards to templates", async () => {
+  const t = createTestInstance();
+  const userId = "test-user";
+
+  // Execute through engine
+  const actionResult = await t.mutation(api.engine.core.executeAction, {
+    templateId: "JOKESTER_ENCOUNTER",
+    actionId: "LAUGH_AT_JOKE",
+    userId
+  });
+
+  // Engine should include rewards
+  expect(actionResult.rewards).toBeDefined();
+
+  // Template execution should merge rewards into content
+  const templateResult = await t.query(api.engine.core.executeTemplate, {
+    templateId: "SOCIAL_SUCCESS",
+    userId,
+    rewards: actionResult.rewards
+  });
+
+  expect(templateResult.content.rewards).toEqual(actionResult.rewards);
+});
+```
+
+### **Reward Format Validation**
+Ensure all rewards follow the standard format:
+
+```typescript
+test("rewards follow icon+amount+name pattern", async () => {
+  const t = createTestInstance();
+  const userId = "test-user";
+
+  await t.mutation(api.features.profile.functions.createPlayer, {
+    userId,
+    displayName: "Test Player"
+  });
+
+  const result = await t.mutation(api.features.social.functions.laughAtJoke, {
+    userId
+  });
+
+  // Verify each reward follows the pattern
+  for (const reward of result.rewards.rewards) {
+    expect(typeof reward.icon).toBe("string");
+    expect(reward.icon.length).toBeGreaterThan(0);
+    expect(typeof reward.amount).toBe("number");
+    expect(reward.amount).toBeGreaterThan(0);
+    expect(typeof reward.name).toBe("string");
+    expect(reward.name.length).toBeGreaterThan(0);
+  }
+});
+```
+
 ## Single Engine Test Demo
 
 This example shows how to test our Feature Template Set flow without any UI dependencies:

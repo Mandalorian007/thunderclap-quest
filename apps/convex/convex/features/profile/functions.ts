@@ -3,6 +3,7 @@ import { zCustomQuery, zCustomMutation } from "convex-helpers/server/zod";
 import { NoOp } from "convex-helpers/server/customFunctions";
 import { z } from "zod";
 import { PlayerSchema } from "./schema";
+import { calculatePlayerLevel, getXPRequiredForLevel, getTotalXPForLevel, getCurrentGameLevelHelper, getXPMultiplier } from "../progression/functions";
 
 const zQuery = zCustomQuery(query, NoOp);
 const zMutation = zCustomMutation(mutation, NoOp);
@@ -77,7 +78,7 @@ export const getPlayerProfileContent = zQuery({
       throw new Error(`Player ${userId} not found - must be created first`);
     }
 
-    return formatProfileContent(player);
+    return await formatProfileContentWithGameLevel(ctx, player);
   }
 });
 
@@ -92,19 +93,19 @@ export async function getPlayerProfileContentHelper(ctx: any, { userId }: { user
     throw new Error(`Player ${userId} not found - must be created first`);
   }
 
-  return formatProfileContent(player);
+  return await formatProfileContentWithGameLevel(ctx, player);
 }
 
 // Helper function to calculate and return raw profile data - exported for engine use
 export function formatProfileContent(player: any) {
-  // Calculate level from XP (simple formula for now)
-  const calculatedLevel = Math.floor(player.xp / 100) + 1;
+  // Calculate level from XP using exponential formula
+  const calculatedLevel = calculatePlayerLevel(player.xp);
 
-  // Calculate XP to next level
-  const currentLevelXP = (calculatedLevel - 1) * 100;
-  const nextLevelXP = calculatedLevel * 100;
-  const xpProgress = player.xp - currentLevelXP;
-  const xpRequired = nextLevelXP - currentLevelXP;
+  // Calculate XP to next level using exponential progression
+  const currentLevelTotalXP = getTotalXPForLevel(calculatedLevel);
+  const nextLevelTotalXP = getTotalXPForLevel(calculatedLevel + 1);
+  const xpProgress = player.xp - currentLevelTotalXP;
+  const xpRequired = nextLevelTotalXP - currentLevelTotalXP;
 
   // Return raw data - UI handles formatting
   return {
@@ -124,5 +125,31 @@ export function formatProfileContent(player: any) {
     // Account data
     createdAt: player.createdAt,
     lastActive: player.lastActive,
+  };
+}
+
+// Enhanced helper function that includes game level and XP multiplier information
+export async function formatProfileContentWithGameLevel(ctx: any, player: any) {
+  // Get base profile content
+  const baseContent = formatProfileContent(player);
+
+  // Get current game level
+  const gameLevel = await getCurrentGameLevelHelper(ctx);
+
+  // Calculate XP multiplier based on player vs game level
+  const xpMultiplier = getXPMultiplier(baseContent.level, gameLevel);
+
+  // Return enhanced profile data
+  return {
+    ...baseContent,
+
+    // Game progression data
+    gameLevel,
+    xpMultiplier,
+
+    // Helper flags for display
+    isBehindGameLevel: baseContent.level < gameLevel,
+    isAheadOfGameLevel: baseContent.level > gameLevel,
+    isAtGameLevel: baseContent.level === gameLevel,
   };
 }

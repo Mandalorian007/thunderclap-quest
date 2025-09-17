@@ -1,11 +1,34 @@
 import { EmbedBuilder } from 'discord.js';
 
+// Import reward formatting
+import type { RewardBundle } from '../../../convex/convex/shared/rewards';
+
 /**
  * Content renderers convert template content into Discord embeds
  * based on template type
  */
 
 type ContentRenderer = (content: any) => EmbedBuilder;
+
+// Helper function to get progression status message
+function getProgressionStatus(content: any): string {
+  if (content.isBehindGameLevel) {
+    const levelsBehind = content.gameLevel - content.level;
+    return `Catch-up (+${levelsBehind} behind)`;
+  } else if (content.isAheadOfGameLevel) {
+    const levelsAhead = content.level - content.gameLevel;
+    return `Prestige (-${levelsAhead} ahead)`;
+  } else {
+    return 'On track';
+  }
+}
+
+// Helper function to format reward bundle for display
+function formatRewardBundle(bundle: RewardBundle): string {
+  return bundle.rewards
+    .map(reward => `${reward.icon} +${reward.amount} ${reward.name}`)
+    .join('\n');
+}
 
 // Color scheme for different encounter types
 const colors = {
@@ -32,6 +55,15 @@ function renderContentByType(content: any): EmbedBuilder {
         { name: '✨ XP', value: `${content.xp}`, inline: true },
         { name: '📊 Progress', value: `${content.xpProgress}/${content.xpRequired} XP`, inline: true }
       );
+
+    // Add game level and XP multiplier info if available
+    if (content.gameLevel !== undefined) {
+      embed.addFields(
+        { name: '🌍 Game Level', value: `${content.gameLevel}`, inline: true },
+        { name: '🔥 XP Multiplier', value: `${Math.round(content.xpMultiplier * 100)}%`, inline: true },
+        { name: '📈 Status', value: getProgressionStatus(content), inline: true }
+      );
+    }
 
     if (content.currentTitle) {
       embed.addFields({ name: '🏆 Current Title', value: content.currentTitle, inline: false });
@@ -98,6 +130,15 @@ function renderContentByType(content: any): EmbedBuilder {
         embed.setColor(colors.neutral);
       }
     }
+  }
+
+  // Add rewards section if present
+  if (content.rewards && content.rewards.rewards && content.rewards.rewards.length > 0) {
+    embed.addFields({
+      name: '🎁 Rewards Earned',
+      value: formatRewardBundle(content.rewards),
+      inline: false
+    });
   }
 
   return embed;
