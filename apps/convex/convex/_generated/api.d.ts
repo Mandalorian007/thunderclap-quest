@@ -28,6 +28,7 @@ import type * as features_index from "../features/index.js";
 import type * as features_profile_functions from "../features/profile/functions.js";
 import type * as features_profile_index from "../features/profile/index.js";
 import type * as features_profile_templates from "../features/profile/templates.js";
+import type * as features_profile_types from "../features/profile/types.js";
 import type * as features_profile from "../features/profile.js";
 import type * as features_puzzle_functions from "../features/puzzle/functions.js";
 import type * as features_puzzle_index from "../features/puzzle/index.js";
@@ -64,6 +65,7 @@ declare const fullApi: ApiFromModules<{
   "features/profile/functions": typeof features_profile_functions;
   "features/profile/index": typeof features_profile_index;
   "features/profile/templates": typeof features_profile_templates;
+  "features/profile/types": typeof features_profile_types;
   "features/profile": typeof features_profile;
   "features/puzzle/functions": typeof features_puzzle_functions;
   "features/puzzle/index": typeof features_puzzle_index;

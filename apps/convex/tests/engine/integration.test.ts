@@ -1,7 +1,7 @@
 // Engine integration test - validates complete template flow
 import { expect, test, describe } from "vitest";
 import { api } from "../../convex/_generated/api";
-import { ProfileTemplateId } from "../../convex/features";
+import { ProfileTemplateId } from "../../convex/features/profile/types";
 import { createTestInstance } from "../helpers/test-utils";
 
 describe("Engine Integration Tests", () => {
