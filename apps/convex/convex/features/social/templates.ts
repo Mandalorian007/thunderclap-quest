@@ -12,7 +12,7 @@ import {
 } from "./functions";
 import { SocialTemplateId, SocialActionId } from "./types";
 
-// Re-export types for external use
+// Re-export for external use
 export { SocialTemplateId, SocialActionId };
 
 // Social feature template set following engine template pattern

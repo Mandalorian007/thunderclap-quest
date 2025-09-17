@@ -17,16 +17,19 @@ Each feature is organized as a complete vertical slice containing all related co
 ```
 features/
 ├── chest/                  # Chest encounter feature
+│   ├── types.ts           # Chest template/action ID enums
 │   ├── schema.ts          # Chest/loot data schemas
 │   ├── functions.ts       # Chest-related queries/mutations
 │   ├── templates.ts       # Chest template definitions
 │   └── index.ts           # Feature exports
 ├── combat/                # Combat encounter feature
+│   ├── types.ts           # Combat template/action ID enums
 │   ├── schema.ts          # Combat/equipment schemas
 │   ├── functions.ts       # Combat logic
 │   ├── templates.ts       # Combat templates
 │   └── index.ts
 └── profile/               # Player profile feature
+    ├── types.ts           # Profile template/action ID enums
     ├── schema.ts          # Player data schema
     ├── functions.ts       # Profile queries/mutations
     ├── templates.ts       # Profile templates
@@ -65,10 +68,8 @@ export type FeatureTemplateSet<TTemplateIds, TActionIds> = {
 
 ## Example: Chest Feature Template Set
 
-**Feature Template Set Definition** (`features/chest/templates.ts`):
+**Feature Types Definition** (`features/chest/types.ts`):
 ```typescript
-import { api } from "../../_generated/api";
-
 // Define all template IDs as enum
 export enum ChestTemplateId {
   MYSTERIOUS_CHEST = "MYSTERIOUS_CHEST",
@@ -90,6 +91,15 @@ export enum ChestActionId {
   DONE = "DONE",
   LEAVE = "LEAVE"
 }
+```
+
+**Feature Template Set Definition** (`features/chest/templates.ts`):
+```typescript
+import { api } from "../../_generated/api";
+import { ChestTemplateId, ChestActionId } from "./types";
+
+// Re-export types for external use
+export { ChestTemplateId, ChestActionId };
 
 // Complete chest encounter flow with enum-based IDs
 export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestActionId> = {
@@ -187,7 +197,7 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
 ```typescript
 import { mutation, query } from "../../_generated/server";
 import { v } from "convex/values";
-import { ChestTemplateId } from "./templates";
+import { ChestTemplateId } from "./types";
 
 // Action functions return enum values or null for completion
 export const examineChest = mutation({
@@ -484,9 +494,11 @@ async function handleButtonInteraction(interaction: ButtonInteraction) {
 
 ## Building New Features
 
-1. **Define Enum IDs**: Create enums for all template and action IDs
-2. **Create Feature Template Set**: Use enums as object keys for direct access
-3. **Implement Functions**: Backend logic with typed enum return values
+1. **Create Types File**: Define enums for all template and action IDs in `features/{feature}/types.ts`
+2. **Implement Functions**: Backend logic with typed enum return values in `features/{feature}/functions.ts` (imports from `./types`)
+3. **Create Feature Template Set**: Use enums as object keys for direct access in `features/{feature}/templates.ts` (imports from `./types`)
 4. **Add to Engine**: Import feature and add template ID check to `getTemplateFromFeature`
+
+**Important**: The `types.ts` file prevents circular imports by keeping enums separate from both `functions.ts` and `templates.ts`.
 
 **Result**: A bulletproof feature framework where all navigation is type-safe, references are validated at compile-time, and new features are trivial to build.

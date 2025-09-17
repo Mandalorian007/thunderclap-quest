@@ -15,7 +15,7 @@ import {
 } from "./functions";
 import { PuzzleTemplateId, PuzzleActionId } from "./types";
 
-// Re-export types for external use
+// Re-export for external use
 export { PuzzleTemplateId, PuzzleActionId };
 
 // Puzzle feature template set following engine template pattern

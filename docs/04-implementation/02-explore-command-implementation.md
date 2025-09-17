@@ -34,14 +34,15 @@ This document provides a step-by-step implementation checklist for the `/explore
 
 ### 2.1 Social Feature Setup
 - [ ] Create `features/social/` directory structure
+  - [ ] `features/social/types.ts` - Template/action ID enums
   - [ ] `features/social/schema.ts` - Social encounter data schemas
-  - [ ] `features/social/functions.ts` - All social action functions
-  - [ ] `features/social/templates.ts` - Social encounter templates
+  - [ ] `features/social/functions.ts` - All social action functions (imports from ./types)
+  - [ ] `features/social/templates.ts` - Social encounter templates (imports from ./types)
   - [ ] `features/social/index.ts` - Feature exports
 
 ### 2.2 Social Template System
-- [ ] Define `SocialTemplateId` enum with all encounter types
-- [ ] Define `SocialActionId` enum with all action types
+- [ ] Define `SocialTemplateId` enum in `types.ts` with all encounter types
+- [ ] Define `SocialActionId` enum in `types.ts` with all action types
 - [ ] Create `socialFeatureTemplateSet` with all encounters
 - [ ] Add social response templates (SUCCESS/FAILURE/NEUTRAL)
 
@@ -80,14 +81,15 @@ This document provides a step-by-step implementation checklist for the `/explore
 
 ### 3.1 Discovery Feature Setup
 - [ ] Create `features/discovery/` directory structure
+  - [ ] `features/discovery/types.ts` - Template/action ID enums
   - [ ] `features/discovery/schema.ts` - Discovery encounter schemas
-  - [ ] `features/discovery/functions.ts` - All discovery action functions
-  - [ ] `features/discovery/templates.ts` - Discovery encounter templates
+  - [ ] `features/discovery/functions.ts` - All discovery action functions (imports from ./types)
+  - [ ] `features/discovery/templates.ts` - Discovery encounter templates (imports from ./types)
   - [ ] `features/discovery/index.ts` - Feature exports
 
 ### 3.2 Discovery Template System
-- [ ] Define `DiscoveryTemplateId` enum with all encounter types
-- [ ] Define `DiscoveryActionId` enum with all action types
+- [ ] Define `DiscoveryTemplateId` enum in `types.ts` with all encounter types
+- [ ] Define `DiscoveryActionId` enum in `types.ts` with all action types
 - [ ] Create `discoveryFeatureTemplateSet` with all encounters
 - [ ] Add discovery response templates (DELIGHT/WONDER/MAGIC)
 
@@ -118,14 +120,15 @@ This document provides a step-by-step implementation checklist for the `/explore
 
 ### 4.1 Puzzle Feature Setup
 - [ ] Create `features/puzzle/` directory structure
+  - [ ] `features/puzzle/types.ts` - Template/action ID enums
   - [ ] `features/puzzle/schema.ts` - Puzzle encounter schemas
-  - [ ] `features/puzzle/functions.ts` - All puzzle action functions
-  - [ ] `features/puzzle/templates.ts` - Puzzle encounter templates
+  - [ ] `features/puzzle/functions.ts` - All puzzle action functions (imports from ./types)
+  - [ ] `features/puzzle/templates.ts` - Puzzle encounter templates (imports from ./types)
   - [ ] `features/puzzle/index.ts` - Feature exports
 
 ### 4.2 Puzzle Template System
-- [ ] Define `PuzzleTemplateId` enum with all encounter types
-- [ ] Define `PuzzleActionId` enum with all action types
+- [ ] Define `PuzzleTemplateId` enum in `types.ts` with all encounter types
+- [ ] Define `PuzzleActionId` enum in `types.ts` with all action types
 - [ ] Create `puzzleFeatureTemplateSet` with all encounters
 - [ ] Add puzzle response templates (SUCCESS/CREATIVE/FAILURE)
 

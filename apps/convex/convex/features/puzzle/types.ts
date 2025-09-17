@@ -1,4 +1,5 @@
-// Define implemented puzzle template IDs as enum
+// Puzzle feature types
+
 export enum PuzzleTemplateId {
   // Traditional puzzles with personality (implemented)
   PICKY_MAGIC_DOOR = "PICKY_MAGIC_DOOR",
@@ -11,7 +12,6 @@ export enum PuzzleTemplateId {
   PUZZLE_FAILURE = "PUZZLE_FAILURE"
 }
 
-// Define all puzzle action IDs as enum
 export enum PuzzleActionId {
   // Door actions
   ANSWER_WORM = "ANSWER_WORM",

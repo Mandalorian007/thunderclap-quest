@@ -1,17 +1,17 @@
-// Define implemented social template IDs as enum
+// Social feature types
+
 export enum SocialTemplateId {
   // Character-specific encounters (implemented)
   JOKESTER_ENCOUNTER = "JOKESTER_ENCOUNTER",
   RIDDLER_ENCOUNTER = "RIDDLER_ENCOUNTER",
   GOSSIP_MERCHANT = "GOSSIP_MERCHANT",
 
-  // Response templates
+  // Standardized outcomes
   SOCIAL_SUCCESS = "SOCIAL_SUCCESS",
-  SOCIAL_NEUTRAL = "SOCIAL_NEUTRAL",
-  SOCIAL_FAILURE = "SOCIAL_FAILURE"
+  SOCIAL_FAILURE = "SOCIAL_FAILURE",
+  SOCIAL_NEUTRAL = "SOCIAL_NEUTRAL"
 }
 
-// Define all social action IDs as enum
 export enum SocialActionId {
   // Jokester actions
   LAUGH_AT_JOKE = "LAUGH_AT_JOKE",
@@ -28,11 +28,11 @@ export enum SocialActionId {
   REJECT_GOSSIP = "REJECT_GOSSIP",
   SHARE_GOSSIP = "SHARE_GOSSIP",
 
-  // Storyteller actions
-  LISTEN_TO_TALE = "LISTEN_TO_TALE",
-  REQUEST_SCARY_STORY = "REQUEST_SCARY_STORY",
-  SHARE_YOUR_STORY = "SHARE_YOUR_STORY",
+  // Hermit actions
+  APOLOGIZE_TO_HERMIT = "APOLOGIZE_TO_HERMIT",
+  DISMISS_HERMIT = "DISMISS_HERMIT",
+  ASK_ABOUT_OLD_DAYS = "ASK_ABOUT_OLD_DAYS",
 
-  // Universal
+  // Universal action
   WALK_AWAY = "WALK_AWAY"
 }

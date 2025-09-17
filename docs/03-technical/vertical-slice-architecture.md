@@ -10,21 +10,25 @@ Thunderclap Quest uses **vertical slice architecture** to organize features. Eac
 apps/convex/convex/
 ├── features/                   # Feature-based vertical slices
 │   ├── profile/               # Player profile feature
+│   │   ├── types.ts           # Template/action ID enums
 │   │   ├── schema.ts          # Player data models
 │   │   ├── functions.ts       # Profile queries/mutations
 │   │   ├── templates.ts       # Profile engine templates
 │   │   └── index.ts           # Feature exports
 │   ├── combat/                # Combat system feature
+│   │   ├── types.ts           # Template/action ID enums
 │   │   ├── schema.ts          # Combat/equipment schemas
 │   │   ├── functions.ts       # Combat logic
 │   │   ├── templates.ts       # Combat encounter templates
 │   │   └── index.ts
 │   ├── quests/                # Quest system feature
+│   │   ├── types.ts           # Template/action ID enums
 │   │   ├── schema.ts          # Quest/objective schemas
 │   │   ├── functions.ts       # Quest logic
 │   │   ├── templates.ts       # Quest encounter templates
 │   │   └── index.ts
 │   └── guilds/                # Guild management feature
+│       ├── types.ts           # Template/action ID enums
 │       ├── schema.ts          # Guild/member schemas
 │       ├── functions.ts       # Guild management
 │       ├── templates.ts       # Guild-related templates
@@ -49,7 +53,21 @@ tests/
 
 ## Feature Slice Components
 
-### 1. Schema (`schema.ts`)
+### 1. Types (`types.ts`)
+Defines template and action ID enums for the feature to prevent circular imports.
+
+```typescript
+// features/profile/types.ts
+export enum ProfileTemplateId {
+  PROFILE_DISPLAY = "PROFILE_DISPLAY"
+}
+
+export enum ProfileActionId {
+  // Profile has no actions - terminal template
+}
+```
+
+### 2. Schema (`schema.ts`)
 Defines all data models for the feature using Zod schemas.
 
 ```typescript
@@ -70,7 +88,7 @@ export const PlayerSchema = z.object({
 export type Player = z.infer<typeof PlayerSchema>;
 ```
 
-### 2. Functions (`functions.ts`)
+### 3. Functions (`functions.ts`)
 Contains all Convex queries, mutations, and helper functions for the feature.
 
 ```typescript
@@ -80,6 +98,7 @@ import { zCustomQuery, zCustomMutation } from "convex-helpers/server/zod";
 import { NoOp } from "convex-helpers/server/customFunctions";
 import { z } from "zod";
 import { PlayerSchema } from "./schema";
+import { ProfileTemplateId } from "./types";
 
 const zQuery = zCustomQuery(query, NoOp);
 const zMutation = zCustomMutation(mutation, NoOp);
@@ -98,21 +117,17 @@ export async function getPlayerProfileContentHelper(ctx: any, { userId }: { user
 }
 ```
 
-### 3. Templates (`templates.ts`)
+### 4. Templates (`templates.ts`)
 Defines engine templates and template sets for the feature.
 
 ```typescript
 // features/profile/templates.ts
 import type { FeatureTemplateSet } from "../../engine/types";
 import { getPlayerProfileContentHelper } from "./functions";
+import { ProfileTemplateId, ProfileActionId } from "./types";
 
-export enum ProfileTemplateId {
-  PROFILE_DISPLAY = "PROFILE_DISPLAY"
-}
-
-export enum ProfileActionId {
-  // Profile has no actions - terminal template
-}
+// Re-export types for external use
+export { ProfileTemplateId, ProfileActionId };
 
 export const profileFeatureTemplateSet: FeatureTemplateSet<ProfileTemplateId, ProfileActionId> = {
   startTemplate: ProfileTemplateId.PROFILE_DISPLAY,
@@ -125,11 +140,12 @@ export const profileFeatureTemplateSet: FeatureTemplateSet<ProfileTemplateId, Pr
 };
 ```
 
-### 4. Index (`index.ts`)
+### 5. Index (`index.ts`)
 Exports all public components of the feature.
 
 ```typescript
 // features/profile/index.ts
+export * from "./types";
 export * from "./schema";
 export * from "./functions";
 export * from "./templates";
@@ -211,6 +227,7 @@ convex/
 
 # New structure
 convex/features/profile/
+├── types.ts           # Template/action ID enums
 ├── schema.ts          # All profile schemas
 ├── functions.ts       # All profile logic
 ├── templates.ts       # All profile templates
@@ -230,9 +247,10 @@ convex/features/profile/
 Avoid importing across features. Use engine layer for shared functionality.
 
 ### 2. **Use Clear Naming**
+- `types.ts` - Always contains template/action ID enums (prevents circular imports)
 - `schema.ts` - Always contains feature schemas
-- `functions.ts` - Always contains Convex functions and helpers
-- `templates.ts` - Always contains engine templates
+- `functions.ts` - Always contains Convex functions and helpers (imports from `./types`)
+- `templates.ts` - Always contains engine templates (imports from `./types`)
 - `index.ts` - Always exports public interface
 
 ### 3. **Test Boundaries**
@@ -249,11 +267,12 @@ If features must interact, document the interaction patterns clearly.
 To add a new "inventory" feature:
 
 1. **Create directory**: `features/inventory/`
-2. **Define schema**: `schema.ts` with item and inventory schemas
-3. **Implement functions**: `functions.ts` with inventory management logic
-4. **Create templates**: `templates.ts` with inventory display templates
-5. **Export interface**: `index.ts` with public exports
-6. **Add to root schema**: Import schemas in root `schema.ts`
-7. **Write tests**: `tests/features/inventory.test.ts`
+2. **Define types**: `types.ts` with template/action ID enums
+3. **Define schema**: `schema.ts` with item and inventory schemas
+4. **Implement functions**: `functions.ts` with inventory management logic (imports from `./types`)
+5. **Create templates**: `templates.ts` with inventory display templates (imports from `./types`)
+6. **Export interface**: `index.ts` with public exports
+7. **Add to root schema**: Import schemas in root `schema.ts`
+8. **Write tests**: `tests/features/inventory.test.ts`
 
 Result: Complete inventory feature contained in single directory, ready for independent development and testing.

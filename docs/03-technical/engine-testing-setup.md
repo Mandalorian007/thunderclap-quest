@@ -39,7 +39,7 @@ import { convexTest } from "convex-test";
 import { expect, test } from "vitest";
 import { api } from "./_generated/api";
 import schema from "./schema";
-import { ChestTemplateId } from "./features/chest-feature";
+import { ChestTemplateId } from "./features/chest/types";
 
 test("chest encounter engine flow", async () => {
   // Fresh isolated backend - automatic cleanup

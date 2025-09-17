@@ -41,7 +41,7 @@ interface SocialAction {
 #### Social Feature Template Set
 
 ```typescript
-// features/social/templates.ts - Following engine template pattern
+// features/social/types.ts - Template/action ID enums
 export enum SocialTemplateId {
   // Character-specific encounters
   JOKESTER_ENCOUNTER = "JOKESTER_ENCOUNTER",
@@ -63,6 +63,7 @@ export enum SocialTemplateId {
   SOCIAL_NEUTRAL = "SOCIAL_NEUTRAL"
 }
 
+// features/social/types.ts
 export enum SocialActionId {
   // Jokester actions
   LAUGH_AT_JOKE = "LAUGH_AT_JOKE",
@@ -88,6 +89,7 @@ export enum SocialActionId {
   WALK_AWAY = "WALK_AWAY"
 }
 
+// features/social/templates.ts - imports from ./types
 export const socialFeatureTemplateSet: FeatureTemplateSet<SocialTemplateId, SocialActionId> = {
   startTemplate: SocialTemplateId.JOKESTER_ENCOUNTER, // Dynamic based on random selection
 
@@ -321,7 +323,7 @@ export const answerRiddle = mutation({
 #### Discovery Feature Template Set
 
 ```typescript
-// features/discovery/templates.ts
+// features/discovery/types.ts - Template/action ID enums
 export enum DiscoveryTemplateId {
   // Whimsical discoveries
   BUTTERFLY_CONFERENCE = "BUTTERFLY_CONFERENCE",
@@ -339,6 +341,7 @@ export enum DiscoveryTemplateId {
   DISCOVERY_MAGIC = "DISCOVERY_MAGIC"
 }
 
+// features/discovery/types.ts
 export enum DiscoveryActionId {
   // Butterfly conference actions
   EAVESDROP_ON_BUTTERFLIES = "EAVESDROP_ON_BUTTERFLIES",
@@ -515,7 +518,7 @@ export enum DiscoveryActionId {
 #### Puzzle Feature Template Set
 
 ```typescript
-// features/puzzle/templates.ts
+// features/puzzle/types.ts - Template/action ID enums
 export enum PuzzleTemplateId {
   // Traditional puzzles with personality
   PICKY_MAGIC_DOOR = "PICKY_MAGIC_DOOR",
@@ -533,6 +536,7 @@ export enum PuzzleTemplateId {
   PUZZLE_FAILURE = "PUZZLE_FAILURE"
 }
 
+// features/puzzle/types.ts
 export enum PuzzleActionId {
   // Door actions
   ANSWER_WORM = "ANSWER_WORM",

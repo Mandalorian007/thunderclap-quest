@@ -1,4 +1,5 @@
-// Define implemented discovery template IDs as enum
+// Discovery feature types
+
 export enum DiscoveryTemplateId {
   // Whimsical discoveries (implemented)
   BUTTERFLY_CONFERENCE = "BUTTERFLY_CONFERENCE",
@@ -11,7 +12,6 @@ export enum DiscoveryTemplateId {
   DISCOVERY_MAGIC = "DISCOVERY_MAGIC"
 }
 
-// Define all discovery action IDs as enum
 export enum DiscoveryActionId {
   // Butterfly conference actions
   EAVESDROP_ON_BUTTERFLIES = "EAVESDROP_ON_BUTTERFLIES",

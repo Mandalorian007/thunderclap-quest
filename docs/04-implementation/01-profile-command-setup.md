@@ -39,6 +39,7 @@ Implement `/profile` command using the Engine Template Framework as the first te
 **Files to Create:**
 - `apps/convex/convex/engine/types.ts` - Core template types
 - `apps/convex/convex/engine/core.ts` - Template execution engine
+- `apps/convex/convex/features/profile/types.ts` - Template/action ID enums
 - `apps/convex/convex/features/profile/templates.ts` - Profile template definitions
 - `apps/convex/convex/features/profile/functions.ts` - Profile business logic
 - `apps/convex/convex/features/profile/schema.ts` - Profile data schemas

@@ -10,10 +10,9 @@ import {
   readTheWalls,
   borrowABook
 } from "./functions";
-
 import { DiscoveryTemplateId, DiscoveryActionId } from "./types";
 
-// Re-export types for external use
+// Re-export for external use
 export { DiscoveryTemplateId, DiscoveryActionId };
 
 // Discovery feature template set following engine template pattern
