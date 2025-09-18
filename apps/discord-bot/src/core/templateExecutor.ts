@@ -25,8 +25,19 @@ export async function executeDiscordTemplate(
     // Import Convex API inside function to avoid deployment issues
     const { api } = await import('../../../convex/convex/_generated/api');
 
+    // Extract Discord user info if available
+    const discordUserInfo = interaction ? {
+      username: interaction.user.username,
+      displayName: interaction.user.displayName,
+      globalName: interaction.user.globalName,
+      avatar: interaction.user.avatar
+    } : undefined;
+
     // Ensure player exists first (auto-create if needed)
-    await convex.mutation(api.features.profile.functions.ensurePlayerExists, { userId });
+    await convex.mutation(api.features.profile.functions.ensurePlayerExists, {
+      userId,
+      discordUserInfo
+    });
 
     // Execute template via engine
     const result = await convex.query(api.engine.core.executeTemplate, {

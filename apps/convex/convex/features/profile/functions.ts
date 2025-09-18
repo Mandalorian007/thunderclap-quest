@@ -19,11 +19,26 @@ export const createPlayer = zMutation({
   }
 });
 
-// Create player if not exists (mutation)
+// Create player if not exists, and update display name if changed (mutation)
 export const ensurePlayerExists = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }) => {
-    return await ensurePlayerExistsModel(ctx, userId);
+  args: {
+    userId: z.string(),
+    discordUserInfo: z.object({
+      username: z.string().optional(),
+      displayName: z.string().optional(),
+      globalName: z.string().optional(),
+      avatar: z.string().optional()
+    }).optional()
+  },
+  handler: async (ctx, { userId, discordUserInfo }) => {
+    // Determine the best display name from Discord info
+    const displayName = discordUserInfo?.displayName ||
+                       discordUserInfo?.globalName ||
+                       discordUserInfo?.username ||
+                       undefined;
+
+    // This will create the player if they don't exist, or update their display name if it has changed
+    return await ensurePlayerExistsModel(ctx, userId, displayName);
   }
 });
 

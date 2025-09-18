@@ -65,10 +65,28 @@ export async function createPlayer(ctx: MutationCtx, userId: string, displayName
   return await ctx.db.get(playerId);
 }
 
-// Ensure player exists, create if not
+// Ensure player exists, create if not, and update display name if it has changed
 export async function ensurePlayerExists(ctx: MutationCtx, userId: string, displayName?: string) {
   try {
-    return await getPlayerByUserId(ctx, userId);
+    const existingPlayer = await getPlayerByUserId(ctx, userId);
+
+    // Update display name if it has changed and we have new info
+    if (displayName && existingPlayer.displayName !== displayName) {
+      await ctx.db.patch(existingPlayer._id, {
+        displayName,
+        lastActive: Date.now()
+      });
+
+      // Return updated player
+      return await ctx.db.get(existingPlayer._id);
+    }
+
+    // Update lastActive timestamp even if display name hasn't changed
+    await ctx.db.patch(existingPlayer._id, {
+      lastActive: Date.now()
+    });
+
+    return existingPlayer;
   } catch (error) {
     // Player doesn't exist, create them
     return await createPlayer(ctx, userId, displayName);
