@@ -114,54 +114,81 @@ describe("Profile Functions", () => {
         t.query(api.features.profile.functions.getPlayerProfileContent, {
           userId
         })
-      ).rejects.toThrow("Player test-nonexistent not found - must be created first");
+      ).rejects.toThrow("Player test-nonexistent not found");
     });
   });
 
   describe("formatProfileContent", () => {
     test("calculates level 1 for 0-99 XP", () => {
-      const player = {
+      const playerWithStats = {
         displayName: "Test",
         xp: 0,
         titles: [],
         currentTitle: undefined,
         createdAt: Date.now(),
-        lastActive: Date.now()
+        lastActive: Date.now(),
+        equippedGear: {},
+        calculatedLevel: 1,
+        xpProgress: 0,
+        xpRequired: 100,
+        xpMultiplier: 1.0,
+        gameLevel: 10,
+        isBehindGameLevel: true,
+        isAheadOfGameLevel: false,
+        isAtGameLevel: false
       };
 
-      const content = formatProfileContent(player);
+      const content = formatProfileContent(playerWithStats);
       expect(content.level).toBe(1);
       expect(content.xpProgress).toBe(0);
       expect(content.xpRequired).toBe(100);
     });
 
     test("calculates level 2 for 150 XP (exponential system)", () => {
-      const player = {
+      const playerWithStats = {
         displayName: "Test",
         xp: 150,
         titles: [],
         currentTitle: undefined,
         createdAt: Date.now(),
-        lastActive: Date.now()
+        lastActive: Date.now(),
+        equippedGear: {},
+        calculatedLevel: 2,
+        xpProgress: 50, // 150 - 100 (level 2 start)
+        xpRequired: 114, // Level 3 requires 214 total, so 114 more from level 2 (150-100=50 progress)
+        xpMultiplier: 1.5,
+        gameLevel: 10,
+        isBehindGameLevel: true,
+        isAheadOfGameLevel: false,
+        isAtGameLevel: false
       };
 
-      const content = formatProfileContent(player);
+      const content = formatProfileContent(playerWithStats);
       expect(content.level).toBe(2);
       expect(content.xpProgress).toBe(50); // 150 - 100 (level 2 start)
       expect(content.xpRequired).toBe(114); // Level 2 requires 114 XP (exponential)
     });
 
     test("calculates level 4 for 450 XP (exponential system)", () => {
-      const player = {
+      const playerWithStats = {
         displayName: "Test",
         xp: 450,
         titles: [],
         currentTitle: undefined,
         createdAt: Date.now(),
-        lastActive: Date.now()
+        lastActive: Date.now(),
+        equippedGear: {},
+        calculatedLevel: 4,
+        xpProgress: 104, // 450 - 346 (level 4 start)
+        xpRequired: 152, // Level 5 requires 152 XP (exponential)
+        xpMultiplier: 1.2,
+        gameLevel: 10,
+        isBehindGameLevel: true,
+        isAheadOfGameLevel: false,
+        isAtGameLevel: false
       };
 
-      const content = formatProfileContent(player);
+      const content = formatProfileContent(playerWithStats);
       expect(content.level).toBe(4);
       expect(content.xpProgress).toBe(104); // 450 - 346 (level 4 start)
       expect(content.xpRequired).toBe(152); // Level 5 requires 152 XP (exponential)
@@ -215,6 +242,7 @@ describe("Profile Functions", () => {
           level: 3, // Note: level is calculated, not stored
           titles: ["Adventurer"],
           currentTitle: "Adventurer",
+          equippedGear: {},
           createdAt: Date.now(),
           lastActive: Date.now()
         });
@@ -241,7 +269,7 @@ describe("Profile Functions", () => {
           const { getPlayerProfileContentHelper } = await import("../../../convex/features/profile/functions");
           return await getPlayerProfileContentHelper(ctx, { userId });
         })
-      ).rejects.toThrow("Player test-helper-nonexistent not found - must be created first");
+      ).rejects.toThrow("Player test-helper-nonexistent not found");
     });
   });
 });

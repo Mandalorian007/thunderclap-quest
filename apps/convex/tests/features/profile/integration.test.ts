@@ -49,6 +49,7 @@ describe("Profile Feature Integration", () => {
           level: 4, // This will be recalculated
           titles: ["First Steps", "Explorer", "Warrior"],
           currentTitle: "Warrior",
+          equippedGear: {},
           createdAt: Date.now() - (30 * 24 * 60 * 60 * 1000), // 30 days ago
           lastActive: Date.now()
         });
@@ -128,7 +129,7 @@ describe("Profile Feature Integration", () => {
         t.query(api.features.profile.functions.getPlayerProfileContent, {
           userId
         })
-      ).rejects.toThrow("Player integration-nonexistent not found - must be created first");
+      ).rejects.toThrow("Player integration-nonexistent not found");
     });
   });
 
@@ -146,6 +147,7 @@ describe("Profile Feature Integration", () => {
           level: 3,
           titles: ["Test Title"],
           currentTitle: "Test Title",
+          equippedGear: {},
           createdAt: Date.now(),
           lastActive: Date.now()
         });
@@ -181,6 +183,7 @@ describe("Profile Feature Integration", () => {
           level: 100,
           titles: ["Legend"],
           currentTitle: "Legend",
+          equippedGear: {},
           createdAt: Date.now(),
           lastActive: Date.now()
         });
