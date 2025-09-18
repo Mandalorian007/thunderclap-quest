@@ -33,22 +33,32 @@ export async function getGearInventoryHelper(ctx: any, { userId }: { userId: str
   if (!inventory || !inventory.gear || inventory.gear.length === 0) {
     return {
       title: "⚔️ Gear Inventory",
-      description: "Your gear inventory is empty.",
+      description: "Your gear inventory is empty. Use `/add-gear` to generate test gear!",
       gear: [],
       isEmpty: true
     };
   }
 
+  // Sort gear by slot for better organization
+  const sortedGear = [...inventory.gear].sort((a, b) => {
+    const slotOrder = ['helm', 'chest', 'gloves', 'legs', 'mainHand', 'offhand'];
+    const aIndex = slotOrder.indexOf(a.slot);
+    const bIndex = slotOrder.indexOf(b.slot);
+    return aIndex - bIndex;
+  });
+
   return {
     title: "⚔️ Gear Inventory",
-    description: `${inventory.gear.length} pieces of equipment`,
-    gear: inventory.gear.map(g => ({
+    description: `${inventory.gear.length} pieces of equipment ready to equip`,
+    gear: sortedGear.map(g => ({
       id: g.id,
       name: g.name,
       emoji: g.emoji,
       slot: g.slot,
       itemLevel: g.itemLevel,
-      rarity: g.rarity
+      combatRating: g.combatRating,
+      rarity: g.rarity,
+      stats: g.stats
     })),
     isEmpty: false
   };
@@ -208,7 +218,14 @@ export const unequipGear = zMutation({
     slot: z.enum(GEAR_SLOTS)
   },
   handler: async (ctx, { userId, slot }) => {
-    return await unequipGearHelper(ctx, userId, slot);
+    try {
+      return await unequipGearHelper(ctx, userId, slot);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('NO_GEAR_EQUIPPED:')) {
+        throw new Error(`No gear equipped in ${slot} slot`);
+      }
+      throw error;
+    }
   }
 });
 
@@ -216,5 +233,41 @@ export const salvageAllGear = zMutation({
   args: { userId: z.string() },
   handler: async (ctx, { userId }) => {
     return await salvageAllGearHelper(ctx, userId);
+  }
+});
+
+export const getUnequippedGearForAutocomplete = zQuery({
+  args: {
+    userId: z.string(),
+    searchTerm: z.string().optional()
+  },
+  handler: async (ctx, { userId, searchTerm }) => {
+    const inventory = await getPlayerInventory(ctx, userId);
+
+    if (!inventory || !inventory.gear || inventory.gear.length === 0) {
+      return [];
+    }
+
+    // Filter gear by search term if provided
+    let filteredGear = inventory.gear;
+    if (searchTerm && searchTerm.length > 0) {
+      const search = searchTerm.toLowerCase();
+      filteredGear = inventory.gear.filter(gear =>
+        gear.name.toLowerCase().includes(search) ||
+        gear.slot.toLowerCase().includes(search) ||
+        gear.rarity.toLowerCase().includes(search)
+      );
+    }
+
+    // Limit to 25 results for autocomplete (Discord limit)
+    return filteredGear.slice(0, 25).map(gear => ({
+      id: gear.id,
+      name: gear.name,
+      emoji: gear.emoji,
+      slot: gear.slot,
+      itemLevel: gear.itemLevel,
+      rarity: gear.rarity,
+      displayName: `${gear.emoji} ${gear.name} (${gear.slot}, lvl ${gear.itemLevel})`
+    }));
   }
 });

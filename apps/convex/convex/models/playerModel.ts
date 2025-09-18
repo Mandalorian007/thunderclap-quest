@@ -158,6 +158,9 @@ export function formatProfileContent(playerWithStats: any) {
     titles: playerWithStats.titles,
     currentTitle: playerWithStats.currentTitle,
 
+    // Equipped gear data
+    equippedGear: playerWithStats.equippedGear || {},
+
     // Account data
     createdAt: playerWithStats.createdAt,
     lastActive: playerWithStats.lastActive,

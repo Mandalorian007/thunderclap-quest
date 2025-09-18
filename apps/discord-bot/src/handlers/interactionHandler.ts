@@ -12,6 +12,11 @@ export function setupInteractionHandlers(client: Client) {
       await handleSlashCommand(interaction);
     }
 
+    // Handle autocomplete interactions
+    if (interaction.isAutocomplete()) {
+      await handleAutocompleteInteraction(interaction);
+    }
+
     // Handle button interactions (template actions)
     if (interaction.isButton()) {
       await handleButtonInteraction(interaction);
@@ -46,6 +51,32 @@ async function handleSlashCommand(interaction: any) {
     } catch (replyError) {
       console.error('Error sending error message:', replyError);
     }
+  }
+}
+
+/**
+ * Handle autocomplete interactions
+ */
+async function handleAutocompleteInteraction(interaction: any) {
+  const command = interaction.client.commands.get(interaction.commandName);
+
+  if (!command) {
+    console.error(`No command matching ${interaction.commandName} was found for autocomplete.`);
+    return;
+  }
+
+  // Check if the command has an autocomplete function
+  if (!command.autocomplete) {
+    console.warn(`Command ${interaction.commandName} doesn't have autocomplete function.`);
+    return;
+  }
+
+  try {
+    await command.autocomplete(interaction);
+  } catch (error) {
+    console.error('Autocomplete error:', error);
+    // Don't send error message to user for autocomplete failures
+    // Just fail silently to avoid breaking the user experience
   }
 }
 

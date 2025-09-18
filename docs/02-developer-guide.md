@@ -43,6 +43,9 @@ pnpm clean                     # Clean build artifacts
 # Convex Specific
 cd apps/convex && npx convex dev      # Convex dev server
 cd apps/convex && npx convex deploy   # Deploy to Convex
+
+# Discord Bot Specific
+pnpm --filter discord-bot deploy-commands    # Deploy Discord slash commands
 ```
 
 ## Core Architecture Patterns
@@ -376,8 +379,7 @@ export async function execute(interaction) {
 }
 ```
 
-2. **Register command**: Add to `apps/discord-bot/src/commands/index.ts`
-3. **Deploy commands**: `cd apps/discord-bot && npm run deploy-commands`
+2. **Deploy commands**: `pnpm --filter discord-bot deploy-commands`
 
 #### Universal Template Executor
 All commands use the same executor:

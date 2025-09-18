@@ -91,7 +91,7 @@ export async function unequipGearHelper(ctx: MutationCtx, userId: string, slot: 
   const player = await getPlayerByUserId(ctx, userId);
 
   if (!player.equippedGear || !player.equippedGear[slot]) {
-    throw new Error(`No gear equipped in ${slot} slot`);
+    throw new Error(`NO_GEAR_EQUIPPED:${slot}`);
   }
 
   const gear = player.equippedGear[slot];
