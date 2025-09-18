@@ -22,8 +22,8 @@ export async function executeDiscordTemplate(
   rewards?: any  // Optional rewards from action execution
 ): Promise<InteractionReplyOptions> {
   try {
-    // Import Convex API inside function to avoid deployment issues
-    const { api } = await import('../types/convex-api');
+    // Import minimal Convex API stub
+    const { api } = await import('../lib/convex-api');
 
     // Extract Discord user info if available
     const discordUserInfo = interaction ? {
@@ -92,8 +92,8 @@ export async function executeTemplateAction(
   interaction: ButtonInteraction
 ): Promise<InteractionReplyOptions> {
   try {
-    // Import Convex API inside function to avoid deployment issues
-    const { api } = await import('../types/convex-api');
+    // Import minimal Convex API stub
+    const { api } = await import('../lib/convex-api');
 
     // Execute action via engine
     const result = await convex.mutation(api.engine.core.executeAction, {

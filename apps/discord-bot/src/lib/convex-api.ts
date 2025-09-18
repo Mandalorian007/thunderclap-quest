@@ -1,7 +1,8 @@
 /* eslint-disable */
 /**
- * Minimal Convex API types for Discord bot
- * Contains only the function references we use
+ * Minimal Convex API stub for Discord bot
+ * Only includes the function references actually used by Discord commands
+ * Avoids importing the full backend which causes TypeScript memory issues
  */
 
 // Minimal type definitions
@@ -11,7 +12,7 @@ type FunctionReference<Args = any, Returns = any> = {
   __returns: Returns;
 };
 
-// API structure matching what we use in the Discord bot
+// API structure with only the functions Discord bot actually uses
 export const api = {
   features: {
     profile: {

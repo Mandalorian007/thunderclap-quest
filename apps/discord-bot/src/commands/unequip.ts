@@ -24,8 +24,8 @@ export async function execute(interaction: CommandInteraction) {
   try {
     await interaction.deferReply();
 
-    // Import API inside function to avoid deployment issues
-    const { api } = await import('../types/convex-api');
+    // Import minimal Convex API stub
+    const { api } = await import('../lib/convex-api');
 
     // Ensure player exists first
     const discordUserInfo = {
