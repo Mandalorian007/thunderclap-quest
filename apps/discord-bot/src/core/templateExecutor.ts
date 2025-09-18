@@ -3,9 +3,12 @@ import {
   CommandInteraction,
   ButtonInteraction,
   InteractionReplyOptions,
+  InteractionEditReplyOptions,
   EmbedBuilder,
   ActionRowBuilder,
-  ButtonBuilder
+  ButtonBuilder,
+  ChatInputCommandInteraction,
+  MessageFlags
 } from 'discord.js';
 import { renderTemplateContent } from './contentRenderers';
 import { renderTemplateActions } from './actionRouter';
@@ -18,9 +21,9 @@ export async function executeDiscordTemplate(
   templateId: string,
   userId: string,
   convex: ConvexHttpClient,
-  interaction?: CommandInteraction | ButtonInteraction,
+  interaction?: ChatInputCommandInteraction | ButtonInteraction,
   rewards?: any  // Optional rewards from action execution
-): Promise<InteractionReplyOptions> {
+): Promise<InteractionEditReplyOptions> {
   try {
     // Import minimal Convex API stub
     const { api } = await import('../lib/convex-api');
@@ -34,13 +37,13 @@ export async function executeDiscordTemplate(
     } : undefined;
 
     // Ensure player exists first (auto-create if needed)
-    await convex.mutation(api.features.profile.functions.ensurePlayerExists, {
+    await convex.mutation(api.features.profile.functions.ensurePlayerExists as any, {
       userId,
       discordUserInfo
     });
 
     // Execute template via engine
-    const result = await convex.query(api.engine.core.executeTemplate, {
+    const result = await convex.query(api.engine.core.executeTemplate as any, {
       templateId,
       userId,
       rewards  // Pass rewards to engine
@@ -56,8 +59,7 @@ export async function executeDiscordTemplate(
 
     return {
       embeds: [embed],
-      components: components.length > 0 ? components : undefined,
-      ephemeral: false
+      components: components.length > 0 ? components : undefined
     };
 
   } catch (error) {
@@ -67,7 +69,7 @@ export async function executeDiscordTemplate(
     const errorEmbed = new EmbedBuilder()
       .setTitle('⚠️ Something went wrong')
       .setDescription(
-        error.message?.includes('not found')
+        (error as Error).message?.includes('not found')
           ? 'Could not load your game data. Please try again.'
           : 'An unexpected error occurred. Please try again later.'
       )
@@ -75,8 +77,7 @@ export async function executeDiscordTemplate(
       .setTimestamp();
 
     return {
-      embeds: [errorEmbed],
-      ephemeral: true
+      embeds: [errorEmbed]
     };
   }
 }
@@ -90,13 +91,13 @@ export async function executeTemplateAction(
   userId: string,
   convex: ConvexHttpClient,
   interaction: ButtonInteraction
-): Promise<InteractionReplyOptions> {
+): Promise<InteractionEditReplyOptions> {
   try {
     // Import minimal Convex API stub
     const { api } = await import('../lib/convex-api');
 
     // Execute action via engine
-    const result = await convex.mutation(api.engine.core.executeAction, {
+    const result = await convex.mutation(api.engine.core.executeAction as any, {
       templateId,
       actionId,
       userId
@@ -121,8 +122,7 @@ export async function executeTemplateAction(
       .setTimestamp();
 
     return {
-      embeds: [errorEmbed],
-      ephemeral: true
+      embeds: [errorEmbed]
     };
   }
 }

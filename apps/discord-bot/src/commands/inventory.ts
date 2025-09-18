@@ -1,10 +1,10 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
   .setName('inventory')
   .setDescription('View and manage your inventory, gear, and items');
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
   // Import inside function to avoid deployment issues
   const { executeDiscordTemplate } = await import('../core/templateExecutor');
 
@@ -31,7 +31,7 @@ export async function execute(interaction: CommandInteraction) {
     if (interaction.deferred) {
       await interaction.editReply({ content: errorMessage });
     } else {
-      await interaction.reply({ content: errorMessage, ephemeral: true });
+      await interaction.reply({ content: errorMessage, flags: MessageFlags.Ephemeral });
     }
   }
 }

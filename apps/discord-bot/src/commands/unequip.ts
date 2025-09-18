@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
   .setName('unequip')
@@ -16,9 +16,9 @@ export const data = new SlashCommandBuilder()
         { name: 'Off Hand 🛡️', value: 'offhand' }
       ));
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
   const userId = interaction.user.id;
-  const slot = interaction.options.get('slot')?.value as string;
+  const slot = interaction.options.getString('slot', true);
   const convex = (interaction.client as any).convex;
 
   try {
@@ -48,17 +48,17 @@ export async function execute(interaction: CommandInteraction) {
 
     // Format stats for display
     const statsText = Object.entries(unequippedGear.stats)
-      .filter(([_, value]) => value && value > 0)
+      .filter(([_, value]) => value && typeof value === 'number' && value > 0)
       .map(([stat, value]) => `${stat}: +${value}`)
       .join(', ') || 'No bonus stats';
 
-    const rarityEmojis = {
+    const rarityEmojis: Record<string, string> = {
       'Common': '⚪',
       'Magic': '🔵',
       'Rare': '🟣'
     };
 
-    const slotDisplayNames = {
+    const slotDisplayNames: Record<string, string> = {
       'helm': 'Helm',
       'chest': 'Chest',
       'gloves': 'Gloves',
@@ -68,9 +68,9 @@ export async function execute(interaction: CommandInteraction) {
     };
 
     const replyMessage = [
-      `**${unequippedGear.emoji} ${unequippedGear.name}** unequipped from ${slotDisplayNames[slot as keyof typeof slotDisplayNames]}!`,
+      `**${unequippedGear.emoji} ${unequippedGear.name}** unequipped from ${slotDisplayNames[slot] || slot}!`,
       ``,
-      `**Rarity:** ${rarityEmojis[unequippedGear.rarity]} ${unequippedGear.rarity}`,
+      `**Rarity:** ${rarityEmojis[unequippedGear.rarity] || '⚪'} ${unequippedGear.rarity}`,
       `**Item Level:** ${unequippedGear.itemLevel}`,
       `**Combat Rating:** ${unequippedGear.combatRating}`,
       `**Stats:** ${statsText}`,
@@ -88,7 +88,7 @@ export async function execute(interaction: CommandInteraction) {
     // Provide more specific error messages
     if (error instanceof Error) {
       if (error.message.includes('No gear equipped in') && error.message.includes('slot')) {
-        const slotDisplayNames = {
+        const slotDisplayNames: Record<string, string> = {
           'helm': 'helm',
           'chest': 'chest',
           'gloves': 'gloves',
@@ -96,7 +96,7 @@ export async function execute(interaction: CommandInteraction) {
           'mainHand': 'main hand',
           'offhand': 'off hand'
         };
-        errorMessage = `❌ No gear equipped in ${slotDisplayNames[slot as keyof typeof slotDisplayNames]} slot. Use \`/inventory\` to see your gear!`;
+        errorMessage = `❌ No gear equipped in ${slotDisplayNames[slot] || slot} slot. Use \`/inventory\` to see your gear!`;
       } else if (error.message.includes('inventory')) {
         errorMessage += 'Could not access inventory.';
       } else if (error.message.includes('Player not found')) {
@@ -111,7 +111,7 @@ export async function execute(interaction: CommandInteraction) {
     if (interaction.deferred) {
       await interaction.editReply({ content: errorMessage });
     } else {
-      await interaction.reply({ content: errorMessage, ephemeral: true });
+      await interaction.reply({ content: errorMessage, flags: MessageFlags.Ephemeral });
     }
   }
 }

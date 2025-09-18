@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, CommandInteraction, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 
 export const data = new SlashCommandBuilder()
@@ -17,9 +17,9 @@ export const data = new SlashCommandBuilder()
         { name: 'Off Hand 🛡️', value: 'offhand' }
       ));
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
   const userId = interaction.user.id;
-  const slot = interaction.options.get('slot')?.value as string;
+  const slot = interaction.options.getString('slot', true);
   const convex = (interaction.client as any).convex;
 
   try {
@@ -69,11 +69,11 @@ export async function execute(interaction: CommandInteraction) {
 
     // Format stats for display
     const statsText = Object.entries(gear.stats)
-      .filter(([_, value]) => value && value > 0)
+      .filter(([_, value]) => value && typeof value === 'number' && value > 0)
       .map(([stat, value]) => `${stat}: +${value}`)
       .join(', ') || 'No bonus stats';
 
-    const rarityEmojis = {
+    const rarityEmojis: Record<string, string> = {
       'Common': '⚪',
       'Magic': '🔵',
       'Rare': '🟣'
@@ -82,7 +82,7 @@ export async function execute(interaction: CommandInteraction) {
     const replyMessage = [
       `**${gear.emoji} ${gear.name}** added to inventory!`,
       ``,
-      `**Rarity:** ${rarityEmojis[gear.rarity]} ${gear.rarity}`,
+      `**Rarity:** ${rarityEmojis[gear.rarity] || '⚪'} ${gear.rarity}`,
       `**Slot:** ${gear.slot}`,
       `**Item Level:** ${gear.itemLevel}`,
       `**Combat Rating:** ${gear.combatRating}`,
@@ -101,7 +101,7 @@ export async function execute(interaction: CommandInteraction) {
     if (interaction.deferred) {
       await interaction.editReply({ content: errorMessage });
     } else {
-      await interaction.reply({ content: errorMessage, ephemeral: true });
+      await interaction.reply({ content: errorMessage, flags: MessageFlags.Ephemeral });
     }
   }
 }

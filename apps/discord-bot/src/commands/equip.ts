@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, AutocompleteInteraction } from 'discord.js';
+import { SlashCommandBuilder, CommandInteraction, AutocompleteInteraction, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
   .setName('equip')
@@ -40,9 +40,9 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
   }
 }
 
-export async function execute(interaction: CommandInteraction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
   const userId = interaction.user.id;
-  const gearId = interaction.options.get('gear')?.value as string;
+  const gearId = interaction.options.getString('gear', true);
   const convex = (interaction.client as any).convex;
 
   try {
@@ -75,11 +75,11 @@ export async function execute(interaction: CommandInteraction) {
 
     // Format stats for display
     const statsText = Object.entries(equippedGear.stats)
-      .filter(([_, value]) => value && value > 0)
+      .filter(([_, value]) => value && typeof value === 'number' && value > 0)
       .map(([stat, value]) => `${stat}: +${value}`)
       .join(', ') || 'No bonus stats';
 
-    const rarityEmojis = {
+    const rarityEmojis: Record<string, string> = {
       'Common': '⚪',
       'Magic': '🔵',
       'Rare': '🟣'
@@ -89,7 +89,7 @@ export async function execute(interaction: CommandInteraction) {
       `**${equippedGear.emoji} ${equippedGear.name}** equipped successfully!`,
       ``,
       `**Slot:** ${equippedGear.slot}`,
-      `**Rarity:** ${rarityEmojis[equippedGear.rarity]} ${equippedGear.rarity}`,
+      `**Rarity:** ${rarityEmojis[equippedGear.rarity] || '⚪'} ${equippedGear.rarity}`,
       `**Item Level:** ${equippedGear.itemLevel}`,
       `**Combat Rating:** ${equippedGear.combatRating}`,
       `**Stats:** ${statsText}`
@@ -125,7 +125,7 @@ export async function execute(interaction: CommandInteraction) {
     if (interaction.deferred) {
       await interaction.editReply({ content: errorMessage });
     } else {
-      await interaction.reply({ content: errorMessage, ephemeral: true });
+      await interaction.reply({ content: errorMessage, flags: MessageFlags.Ephemeral });
     }
   }
 }
