@@ -202,10 +202,23 @@ test("action awards XP correctly", async () => {
 ```
 
 ### Testing Rules
-1. **Never use `ctx.runMutation()` inside `t.run()` callbacks** - Use helpers directly
+1. **CRITICAL: Never use `ctx.runMutation()` inside `t.run()` callbacks** - convex-test prohibits this
 2. **Always create test players first** - Most functions require existing player
 3. **Test both success and failure paths** - Ensure error handling works
 4. **Use helper functions in tests** - Same pattern as production code
+
+### Critical Testing Anti-Pattern
+```typescript
+// ❌ WRONG - This ALWAYS fails
+await t.run(async (ctx) => {
+  await ctx.runMutation(api.inventory.functions.equipGear, { ... });
+});
+
+// ✅ CORRECT - Use helpers directly or call from outside
+await t.run(async (ctx) => {
+  await equipGearHelper(ctx, userId, gearId);
+});
+```
 
 ## Key Development Flows
 

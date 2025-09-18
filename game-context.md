@@ -77,7 +77,9 @@
 ## Game Level & Pacing Control
 
 ### Bi-Weekly Progression Cycle
-- **Automatic Increases**: Game level rises +10 every two weeks globally
+- **Automatic Increases**: Game level rises +10 every two weeks globally via Convex cron jobs
+- **Cron Schedule**: `"0 0 */14 * *"` (every 14 days at midnight UTC)
+- **Safety Checks**: Time validation prevents early increases, admin can disable auto-increases
 - **Difficulty Scaling**: All encounters scale to game level baseline
 - **Community Synchronization**: Ensures players share similar progression experiences
 
