@@ -1,7 +1,15 @@
 import { EmbedBuilder } from 'discord.js';
 
-// Import reward formatting
-import type { RewardBundle } from '../../../convex/convex/shared/rewards';
+// Inline reward types to avoid backend source imports
+interface RewardEntry {
+  icon: string;
+  amount: number;
+  name: string;
+}
+
+interface RewardBundle {
+  rewards: RewardEntry[];
+}
 
 /**
  * Content renderers convert template content into Discord embeds

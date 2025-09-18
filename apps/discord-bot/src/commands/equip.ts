@@ -17,7 +17,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
 
   try {
     // Import API inside function to avoid deployment issues
-    const { api } = await import('../../../convex/convex/_generated/api');
+    const { api } = await import('../types/convex-api');
 
     // Get unequipped gear for autocomplete
     const availableGear = await convex.query(api.features.inventory.functions.getUnequippedGearForAutocomplete, {
@@ -49,7 +49,7 @@ export async function execute(interaction: CommandInteraction) {
     await interaction.deferReply();
 
     // Import API inside function to avoid deployment issues
-    const { api } = await import('../../../convex/convex/_generated/api');
+    const { api } = await import('../types/convex-api');
 
     // Ensure player exists first
     const discordUserInfo = {

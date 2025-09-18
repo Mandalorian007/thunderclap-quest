@@ -23,7 +23,7 @@ export async function executeDiscordTemplate(
 ): Promise<InteractionReplyOptions> {
   try {
     // Import Convex API inside function to avoid deployment issues
-    const { api } = await import('../../../convex/convex/_generated/api');
+    const { api } = await import('../types/convex-api');
 
     // Extract Discord user info if available
     const discordUserInfo = interaction ? {
@@ -93,7 +93,7 @@ export async function executeTemplateAction(
 ): Promise<InteractionReplyOptions> {
   try {
     // Import Convex API inside function to avoid deployment issues
-    const { api } = await import('../../../convex/convex/_generated/api');
+    const { api } = await import('../types/convex-api');
 
     // Execute action via engine
     const result = await convex.mutation(api.engine.core.executeAction, {
