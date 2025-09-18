@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { EquippedGearSchema } from "../inventory/schema";
 
-// Complete Player schema matching the documentation
+// Complete Player schema with hybrid inventory design
 export const PlayerSchema = z.object({
   // Identity
   userId: z.string(),           // Discord ID (primary key)
@@ -14,7 +15,8 @@ export const PlayerSchema = z.object({
   titles: z.array(z.string()), // Earned achievements
   currentTitle: z.string().optional(),   // Active title
 
-  // TODO: Add equipped gear and inventory later
+  // Equipped gear - stored on player for fast profile/combat access
+  equippedGear: EquippedGearSchema
 });
 
 export type Player = z.infer<typeof PlayerSchema>;

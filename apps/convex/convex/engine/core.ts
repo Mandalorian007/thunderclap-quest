@@ -90,14 +90,17 @@ import { exploreFeatureTemplateSet } from '../features/explore/templates';
 import { socialFeatureTemplateSet } from '../features/social/templates';
 import { discoveryFeatureTemplateSet } from '../features/discovery/templates';
 import { puzzleFeatureTemplateSet } from '../features/puzzle/templates';
+import { inventoryFeatureTemplateSet } from '../features/inventory/templates';
 
 // Import functions to trigger action helper registrations
 import '../features/social/functions';
 import '../features/discovery/functions';
 import '../features/puzzle/functions';
+import '../features/inventory/functions';
 
 registerFeatureTemplateSet(profileFeatureTemplateSet);
 registerFeatureTemplateSet(exploreFeatureTemplateSet);
 registerFeatureTemplateSet(socialFeatureTemplateSet);
 registerFeatureTemplateSet(discoveryFeatureTemplateSet);
 registerFeatureTemplateSet(puzzleFeatureTemplateSet);
+registerFeatureTemplateSet(inventoryFeatureTemplateSet);

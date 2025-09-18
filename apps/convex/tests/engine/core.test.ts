@@ -64,6 +64,7 @@ describe("Engine Template Framework", () => {
       level: 3,
       titles: ["First Steps", "Explorer"],
       currentTitle: "Explorer",
+      equippedGear: {},
     };
 
     await t.run(async (ctx) => {

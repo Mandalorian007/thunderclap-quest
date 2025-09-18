@@ -37,6 +37,16 @@ export const ITEM_REWARD = {
   name: "Item"
 } as const;
 
+export const GEAR_REWARD = {
+  icon: "⚔️",
+  name: "Gear"
+} as const;
+
+export const MATERIAL_REWARD = {
+  icon: "⛏️",
+  name: "Material"
+} as const;
+
 export const STAT_REWARD = {
   icon: "📊",
   name: "Stat"

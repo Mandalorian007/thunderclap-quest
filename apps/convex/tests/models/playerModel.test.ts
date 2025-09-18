@@ -1,17 +1,12 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { convexTest } from "convex-test";
+import { describe, it, expect } from "vitest";
 import { api } from "../../convex/_generated/api";
-import schema from "../../convex/schema";
+import { createTestInstance } from "../helpers/test-utils";
 
 describe("playerModel", () => {
-  let t: any;
-
-  beforeEach(async () => {
-    t = convexTest(schema);
-  });
 
   describe("player creation and retrieval", () => {
     it("should create a player with correct default values", async () => {
+      const t = createTestInstance();
       const userId = "test-user-123";
       const displayName = "Test Player";
 
@@ -31,6 +26,7 @@ describe("playerModel", () => {
     });
 
     it("should get player profile content with computed fields", async () => {
+      const t = createTestInstance();
       const userId = "test-user-456";
 
       // Create player first
@@ -53,6 +49,7 @@ describe("playerModel", () => {
     });
 
     it("should ensure player exists creates player if not found", async () => {
+      const t = createTestInstance();
       const userId = "new-user-789";
 
       const player = await t.mutation(api.features.profile.functions.ensurePlayerExists, {
@@ -68,6 +65,7 @@ describe("playerModel", () => {
 
   describe("XP and progression", () => {
     it("should award XP and update level correctly", async () => {
+      const t = createTestInstance();
       const userId = "xp-test-user";
 
       // Create player first
@@ -96,6 +94,7 @@ describe("playerModel", () => {
     });
 
     it("should award titles correctly", async () => {
+      const t = createTestInstance();
       const userId = "title-test-user";
       const title = "Test Champion";
 
@@ -132,6 +131,7 @@ describe("playerModel", () => {
 
   describe("game level integration", () => {
     it("should include game level in profile content", async () => {
+      const t = createTestInstance();
       const userId = "game-level-test";
 
       // Create player first

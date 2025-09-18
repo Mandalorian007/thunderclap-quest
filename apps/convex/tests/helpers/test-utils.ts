@@ -30,6 +30,7 @@ export async function createTestPlayer(
     level: 1,
     titles: [],
     currentTitle: undefined,
+    equippedGear: {}, // Required for new schema
     ...overrides,
   };
 

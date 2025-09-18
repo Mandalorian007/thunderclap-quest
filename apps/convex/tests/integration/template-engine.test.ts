@@ -1,17 +1,12 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { convexTest } from "convex-test";
+import { describe, it, expect } from "vitest";
 import { api } from "../../convex/_generated/api";
-import schema from "../../convex/schema";
+import { createTestInstance } from "../helpers/test-utils";
 
 describe("Template Engine Integration", () => {
-  let t: any;
-
-  beforeEach(async () => {
-    t = convexTest(schema);
-  });
 
   describe("engine core functions", () => {
     it("should execute profile template without warnings", async () => {
+      const t = createTestInstance();
       const userId = "template-test-user";
 
       // Create player first
@@ -34,6 +29,7 @@ describe("Template Engine Integration", () => {
     });
 
     it("should get template registry", async () => {
+      const t = createTestInstance();
       const registry = await t.query(api.engine.core.getTemplateRegistry, {});
 
       expect(Array.isArray(registry)).toBe(true);
@@ -41,6 +37,7 @@ describe("Template Engine Integration", () => {
     });
 
     it("should resolve template content", async () => {
+      const t = createTestInstance();
       const userId = "content-test-user";
 
       // Create player first
@@ -62,6 +59,7 @@ describe("Template Engine Integration", () => {
 
   describe("social encounter integration", () => {
     it("should execute social action and award rewards", async () => {
+      const t = createTestInstance();
       const userId = "social-test-user";
 
       // Create player first
@@ -90,6 +88,7 @@ describe("Template Engine Integration", () => {
     });
 
     it("should handle completion actions", async () => {
+      const t = createTestInstance();
       const userId = "completion-test-user";
 
       // Create player first
@@ -112,6 +111,7 @@ describe("Template Engine Integration", () => {
 
   describe("progression system integration", () => {
     it("should calculate XP multipliers based on game level", async () => {
+      const t = createTestInstance();
       const userId = "progression-test-user";
 
       // Create player first
@@ -139,6 +139,7 @@ describe("Template Engine Integration", () => {
     });
 
     it("should get progression statistics", async () => {
+      const t = createTestInstance();
       // Create a few test players
       await t.mutation(api.features.profile.functions.createPlayer, {
         userId: "stats-user-1",
@@ -169,6 +170,7 @@ describe("Template Engine Integration", () => {
 
   describe("error handling", () => {
     it("should handle missing player gracefully", async () => {
+      const t = createTestInstance();
       await expect(
         t.query(api.features.profile.functions.getPlayerProfileContent, {
           userId: "nonexistent-user"
@@ -177,6 +179,7 @@ describe("Template Engine Integration", () => {
     });
 
     it("should handle invalid template ID", async () => {
+      const t = createTestInstance();
       const userId = "error-test-user";
 
       await expect(
@@ -188,6 +191,7 @@ describe("Template Engine Integration", () => {
     });
 
     it("should handle invalid action ID", async () => {
+      const t = createTestInstance();
       const userId = "action-error-user";
 
       // Create player first

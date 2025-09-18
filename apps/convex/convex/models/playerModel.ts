@@ -59,6 +59,7 @@ export async function createPlayer(ctx: MutationCtx, userId: string, displayName
     level: 1,
     titles: [],
     currentTitle: undefined,
+    equippedGear: {}, // Default empty equipped gear
   };
 
   const playerId = await ctx.db.insert("players", playerData);

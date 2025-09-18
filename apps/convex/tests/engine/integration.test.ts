@@ -21,6 +21,7 @@ describe("Engine Integration Tests", () => {
         level: 2,
         titles: ["First Steps"],
         currentTitle: "First Steps",
+        equippedGear: {},
       });
     });
 
