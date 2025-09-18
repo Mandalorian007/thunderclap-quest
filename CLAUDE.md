@@ -133,6 +133,28 @@ Discord rendering automatically detects content structure:
 - **Discovery encounters**: Has `environment` field
 - **Outcomes**: Uses appropriate terminal templates
 
+### Testing Framework Rules
+**CRITICAL**: Never use `ctx.runMutation()` or `ctx.runQuery()` inside `t.run()` callbacks - convex-test prohibits Convex functions calling other Convex functions.
+
+**✅ CORRECT**:
+```typescript
+await t.run(async (ctx) => {
+  // Use helper functions directly
+  await equipGearHelper(ctx, userId, gearId);
+});
+
+// OR call from outside the context
+await t.mutation(api.inventory.functions.equipGear, { ... });
+```
+
+**❌ WRONG**:
+```typescript
+await t.run(async (ctx) => {
+  // This ALWAYS fails
+  await ctx.runMutation(api.inventory.functions.equipGear, { ... });
+});
+```
+
 ### Custom Commands
 Use the `/load-context` command to systematically review complete project documentation when starting work on new features.
 
