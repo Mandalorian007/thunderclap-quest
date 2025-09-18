@@ -5,200 +5,184 @@ import { z } from "zod";
 import { DiscoveryTemplateId } from "./types";
 import { awardXPHelper, awardTitleHelper } from "../progression/functions";
 import { ActionResult, XP_REWARD, TITLE_REWARD, RewardEntry } from "../../shared/rewards";
+import { registerActionHelper } from "../../helpers/actionRegistry";
 
 const zQuery = zCustomQuery(query, NoOp);
 const zMutation = zCustomMutation(mutation, NoOp);
 
-// Helper functions now use the centralized progression system
+// Action registry system - only helper functions are used for template actions
 
-// Butterfly conference encounter actions
-export const eavesdropOnButterflies = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }): Promise<ActionResult> => {
-    const xpResult = await awardXPHelper(ctx, userId, 15, "discovery.eavesdropOnButterflies");
-    const titleAwarded = await awardTitleHelper(ctx, userId, "Butterfly Translator");
+export async function eavesdropOnButterfliesHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 15, "discovery.eavesdropOnButterflies");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Butterfly Translator");
 
-    const rewards: RewardEntry[] = [
-      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
-    ];
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
 
-    if (titleAwarded) {
-      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Butterfly Translator" });
-    }
-
-    return {
-      nextTemplateId: DiscoveryTemplateId.DISCOVERY_WONDER,
-      rewards: { rewards }
-    };
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Butterfly Translator" });
   }
-});
 
-export const joinButterflyDebate = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }): Promise<ActionResult> => {
-    const xpResult = await awardXPHelper(ctx, userId, 20, "discovery.joinButterflyDebate");
-    const titleAwarded = await awardTitleHelper(ctx, userId, "Controversial Pollinator");
+  return {
+    nextTemplateId: DiscoveryTemplateId.DISCOVERY_WONDER,
+    rewards: { rewards }
+  };
+}
 
-    const rewards: RewardEntry[] = [
-      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
-    ];
+export async function joinButterflyDebateHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 20, "discovery.joinButterflyDebate");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Controversial Pollinator");
 
-    if (titleAwarded) {
-      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Controversial Pollinator" });
-    }
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
 
-    return {
-      nextTemplateId: DiscoveryTemplateId.DISCOVERY_WONDER,
-      rewards: { rewards }
-    };
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Controversial Pollinator" });
   }
-});
 
-export const mediateButterflyDispute = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }): Promise<ActionResult> => {
-    const xpResult = await awardXPHelper(ctx, userId, 25, "discovery.mediateButterflyDispute");
-    const titleAwarded = await awardTitleHelper(ctx, userId, "Diplomat");
+  return {
+    nextTemplateId: DiscoveryTemplateId.DISCOVERY_WONDER,
+    rewards: { rewards }
+  };
+}
 
-    const rewards: RewardEntry[] = [
-      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
-    ];
+export async function mediateButterflyDisputeHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 25, "discovery.mediateButterflyDispute");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Diplomat");
 
-    if (titleAwarded) {
-      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Diplomat" });
-    }
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
 
-    return {
-      nextTemplateId: DiscoveryTemplateId.DISCOVERY_MAGIC,
-      rewards: { rewards }
-    };
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Diplomat" });
   }
-});
 
-// Upside-down puddle encounter actions
-export const stickHandInPuddle = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }): Promise<ActionResult> => {
-    const xpResult = await awardXPHelper(ctx, userId, 15, "discovery.stickHandInPuddle");
-    const titleAwarded = await awardTitleHelper(ctx, userId, "Brave");
+  return {
+    nextTemplateId: DiscoveryTemplateId.DISCOVERY_MAGIC,
+    rewards: { rewards }
+  };
+}
 
-    const rewards: RewardEntry[] = [
-      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
-    ];
+export async function stickHandInPuddleHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 15, "discovery.stickHandInPuddle");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Brave");
 
-    if (titleAwarded) {
-      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Brave" });
-    }
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
 
-    return {
-      nextTemplateId: DiscoveryTemplateId.DISCOVERY_MAGIC,
-      rewards: { rewards }
-    };
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Brave" });
   }
-});
 
-export const dropCoinInPuddle = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }): Promise<ActionResult> => {
-    const xpResult = await awardXPHelper(ctx, userId, 10, "discovery.dropCoinInPuddle");
-    const titleAwarded = await awardTitleHelper(ctx, userId, "Fish Apologizer");
+  return {
+    nextTemplateId: DiscoveryTemplateId.DISCOVERY_MAGIC,
+    rewards: { rewards }
+  };
+}
 
-    const rewards: RewardEntry[] = [
-      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
-    ];
+export async function dropCoinInPuddleHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 10, "discovery.dropCoinInPuddle");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Fish Apologizer");
 
-    if (titleAwarded) {
-      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Fish Apologizer" });
-    }
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
 
-    return {
-      nextTemplateId: DiscoveryTemplateId.DISCOVERY_WONDER,
-      rewards: { rewards }
-    };
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Fish Apologizer" });
   }
-});
 
-export const drinkFromPuddle = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }): Promise<ActionResult> => {
-    const xpResult = await awardXPHelper(ctx, userId, 20, "discovery.drinkFromPuddle");
-    const titleAwarded = await awardTitleHelper(ctx, userId, "Rainbow Burper");
+  return {
+    nextTemplateId: DiscoveryTemplateId.DISCOVERY_WONDER,
+    rewards: { rewards }
+  };
+}
 
-    const rewards: RewardEntry[] = [
-      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
-    ];
+export async function drinkFromPuddleHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 20, "discovery.drinkFromPuddle");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Rainbow Burper");
 
-    if (titleAwarded) {
-      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Rainbow Burper" });
-    }
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
 
-    return {
-      nextTemplateId: DiscoveryTemplateId.DISCOVERY_MAGIC,
-      rewards: { rewards }
-    };
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Rainbow Burper" });
   }
-});
 
-// Book house encounter actions
-export const knockOnBookDoor = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }): Promise<ActionResult> => {
-    const xpResult = await awardXPHelper(ctx, userId, 25, "discovery.knockOnBookDoor");
-    const titleAwarded = await awardTitleHelper(ctx, userId, "Polite");
+  return {
+    nextTemplateId: DiscoveryTemplateId.DISCOVERY_MAGIC,
+    rewards: { rewards }
+  };
+}
 
-    const rewards: RewardEntry[] = [
-      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
-    ];
+export async function knockOnBookDoorHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 25, "discovery.knockOnBookDoor");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Polite");
 
-    if (titleAwarded) {
-      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Polite" });
-    }
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
 
-    return {
-      nextTemplateId: DiscoveryTemplateId.DISCOVERY_DELIGHT,
-      rewards: { rewards }
-    };
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Polite" });
   }
-});
 
-export const readTheWalls = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }): Promise<ActionResult> => {
-    const xpResult = await awardXPHelper(ctx, userId, 15, "discovery.readTheWalls");
-    const titleAwarded = await awardTitleHelper(ctx, userId, "Scholar");
+  return {
+    nextTemplateId: DiscoveryTemplateId.DISCOVERY_DELIGHT,
+    rewards: { rewards }
+  };
+}
 
-    const rewards: RewardEntry[] = [
-      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
-    ];
+export async function readTheWallsHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 15, "discovery.readTheWalls");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Scholar");
 
-    if (titleAwarded) {
-      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Scholar" });
-    }
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
 
-    return {
-      nextTemplateId: DiscoveryTemplateId.DISCOVERY_WONDER,
-      rewards: { rewards }
-    };
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Scholar" });
   }
-});
 
-export const borrowABook = zMutation({
-  args: { userId: z.string() },
-  handler: async (ctx, { userId }): Promise<ActionResult> => {
-    const xpResult = await awardXPHelper(ctx, userId, 10, "discovery.borrowABook");
-    const titleAwarded = await awardTitleHelper(ctx, userId, "Polite Patron");
+  return {
+    nextTemplateId: DiscoveryTemplateId.DISCOVERY_WONDER,
+    rewards: { rewards }
+  };
+}
 
-    const rewards: RewardEntry[] = [
-      { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
-    ];
+export async function borrowABookHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 10, "discovery.borrowABook");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Polite Patron");
 
-    if (titleAwarded) {
-      rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Polite Patron" });
-    }
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
 
-    return {
-      nextTemplateId: DiscoveryTemplateId.DISCOVERY_MAGIC,
-      rewards: { rewards }
-    };
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Polite Patron" });
   }
-});
+
+  return {
+    nextTemplateId: DiscoveryTemplateId.DISCOVERY_MAGIC,
+    rewards: { rewards }
+  };
+}
+
+// Register all discovery action helpers with template.action naming
+registerActionHelper("BUTTERFLY_CONFERENCE.EAVESDROP_ON_BUTTERFLIES", eavesdropOnButterfliesHelper);
+registerActionHelper("BUTTERFLY_CONFERENCE.JOIN_BUTTERFLY_DEBATE", joinButterflyDebateHelper);
+registerActionHelper("BUTTERFLY_CONFERENCE.MEDIATE_BUTTERFLY_DISPUTE", mediateButterflyDisputeHelper);
+
+registerActionHelper("UPSIDE_DOWN_PUDDLE.STICK_HAND_IN_PUDDLE", stickHandInPuddleHelper);
+registerActionHelper("UPSIDE_DOWN_PUDDLE.DROP_COIN_IN_PUDDLE", dropCoinInPuddleHelper);
+registerActionHelper("UPSIDE_DOWN_PUDDLE.DRINK_FROM_PUDDLE", drinkFromPuddleHelper);
+
+registerActionHelper("BOOK_HOUSE.KNOCK_ON_BOOK_DOOR", knockOnBookDoorHelper);
+registerActionHelper("BOOK_HOUSE.READ_THE_WALLS", readTheWallsHelper);
+registerActionHelper("BOOK_HOUSE.BORROW_A_BOOK", borrowABookHelper);

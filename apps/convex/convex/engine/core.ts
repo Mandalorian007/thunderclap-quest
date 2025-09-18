@@ -2,59 +2,20 @@ import { mutation, query } from "../_generated/server";
 import { zCustomQuery, zCustomMutation } from "convex-helpers/server/zod";
 import { NoOp } from "convex-helpers/server/customFunctions";
 import { z } from "zod";
-import type { TemplateExecutionResult, ActionExecutionResult, FeatureTemplateSet } from "./types";
+import type { TemplateExecutionResult, ActionExecutionResult } from "./types";
+import {
+  registerFeatureTemplateSet,
+  getTemplateFromRegistry,
+  getTemplateRegistryKeys,
+  executeTemplateContent,
+  executeTemplateAction
+} from "../helpers/templateHelpers";
 
-// Features will be imported and registered when needed
+// Re-export for external use
+export { registerFeatureTemplateSet };
 
 const zQuery = zCustomQuery(query, NoOp);
 const zMutation = zCustomMutation(mutation, NoOp);
-
-// Template registry - will be populated by feature imports
-let templateRegistry: Record<string, FeatureTemplateSet<any, any>> = {};
-
-// Initialize registry
-function initializeRegistry() {
-  if (!templateRegistry) {
-    templateRegistry = {};
-  }
-}
-
-// Register a feature template set
-export function registerFeatureTemplateSet<TTemplateIds extends string | number | symbol, TActionIds extends string | number | symbol>(
-  featureTemplateSet: FeatureTemplateSet<TTemplateIds, TActionIds>
-): void {
-  initializeRegistry();
-
-  if (!featureTemplateSet || !featureTemplateSet.templates) {
-    console.warn('Attempted to register invalid feature template set:', featureTemplateSet);
-    return;
-  }
-
-  Object.keys(featureTemplateSet.templates).forEach(templateId => {
-    const template = featureTemplateSet.templates[templateId as keyof typeof featureTemplateSet.templates];
-    if (template) {
-      templateRegistry[templateId as string] = featureTemplateSet;
-    } else {
-      console.warn(`Template ${templateId} is undefined in feature set`);
-    }
-  });
-}
-
-// Get template by ID from registry
-function getTemplate(templateId: string) {
-  initializeRegistry();
-  const featureSet = templateRegistry[templateId];
-  if (!featureSet) {
-    throw new Error(`Template ${templateId} not found in registry`);
-  }
-
-  const template = featureSet.templates[templateId as keyof typeof featureSet.templates];
-  if (!template) {
-    throw new Error(`Template ${templateId} not found in feature set`);
-  }
-
-  return template;
-}
 
 // Resolve template content (static or dynamic via Convex function)
 export const resolveTemplateContent = zQuery({
@@ -63,11 +24,7 @@ export const resolveTemplateContent = zQuery({
     userId: z.string()
   },
   handler: async (ctx, { content, userId }) => {
-    // If content is a function reference, call it. Otherwise return as-is
-    if (typeof content === 'function') {
-      return await content(ctx, { userId });
-    }
-    return content;
+    return await executeTemplateContent(ctx, content, userId);
   }
 });
 
@@ -79,15 +36,10 @@ export const executeTemplate = zQuery({
     rewards: z.any().optional() // Optional rewards to include in content
   },
   handler: async (ctx, { templateId, userId, rewards }): Promise<TemplateExecutionResult> => {
-    const template = getTemplate(templateId);
+    const template = getTemplateFromRegistry(templateId);
 
-    // Resolve content
-    let content;
-    if (typeof template.content === 'function') {
-      content = await template.content(ctx, { userId });
-    } else {
-      content = template.content;
-    }
+    // Resolve content using helper
+    let content = await executeTemplateContent(ctx, template.content, userId);
 
     // Add rewards to content if provided
     if (rewards) {
@@ -120,37 +72,7 @@ export const executeAction = zMutation({
     userId: z.string()
   },
   handler: async (ctx, { templateId, actionId, userId }): Promise<ActionExecutionResult> => {
-    const template = getTemplate(templateId);
-    const action = template.actions.find(a => a.id === actionId);
-
-    if (!action) {
-      throw new Error(`Action ${actionId} not found in template ${templateId}`);
-    }
-
-    if (typeof action.execute === 'string') {
-      // Static routing - return the template ID
-      return { nextTemplateId: action.execute };
-    } else if (action.execute === null) {
-      // Explicit completion
-      return { isComplete: true };
-    } else {
-      // Dynamic routing - call the zMutation function directly
-      const result = await action.execute(ctx, { userId });
-
-      // Handle ActionResult with rewards
-      if (result && typeof result === 'object' && 'nextTemplateId' in result) {
-        return {
-          nextTemplateId: result.nextTemplateId,
-          isComplete: !result.nextTemplateId,
-          rewards: result.rewards
-        };
-      }
-
-      // Handle legacy string/null result
-      return result
-        ? { nextTemplateId: result as string }
-        : { isComplete: true };
-    }
+    return await executeTemplateAction(ctx, templateId, actionId, userId);
   }
 });
 
@@ -158,18 +80,24 @@ export const executeAction = zMutation({
 export const getTemplateRegistry = zQuery({
   args: {},
   handler: async (ctx, {}) => {
-    initializeRegistry();
-    return Object.keys(templateRegistry);
+    return getTemplateRegistryKeys();
   }
 });
 
 // Register all template sets at startup to avoid circular imports
 import { profileFeatureTemplateSet } from '../features/profile/templates';
+import { exploreFeatureTemplateSet } from '../features/explore/templates';
 import { socialFeatureTemplateSet } from '../features/social/templates';
 import { discoveryFeatureTemplateSet } from '../features/discovery/templates';
 import { puzzleFeatureTemplateSet } from '../features/puzzle/templates';
 
+// Import functions to trigger action helper registrations
+import '../features/social/functions';
+import '../features/discovery/functions';
+import '../features/puzzle/functions';
+
 registerFeatureTemplateSet(profileFeatureTemplateSet);
+registerFeatureTemplateSet(exploreFeatureTemplateSet);
 registerFeatureTemplateSet(socialFeatureTemplateSet);
 registerFeatureTemplateSet(discoveryFeatureTemplateSet);
 registerFeatureTemplateSet(puzzleFeatureTemplateSet);

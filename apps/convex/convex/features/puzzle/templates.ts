@@ -1,17 +1,17 @@
 import type { FeatureTemplateSet } from "../../engine/types";
 import {
-  answerWorm,
-  answerCreatively,
-  askForHint,
-  tryToForce,
-  pressSix,
-  pressEight,
-  pressRandom,
-  askPattern,
-  answerKeyboard,
-  makeWildGuess,
-  askForClue,
-  complimentMirror
+  answerWormHelper,
+  answerCreativelyHelper,
+  askForHintHelper,
+  tryToForceHelper,
+  pressSixHelper,
+  pressEightHelper,
+  pressRandomHelper,
+  askPatternHelper,
+  answerKeyboardHelper,
+  makeWildGuessHelper,
+  askForClueHelper,
+  complimentMirrorHelper
 } from "./functions";
 import { PuzzleTemplateId, PuzzleActionId } from "./types";
 
@@ -39,22 +39,22 @@ export const puzzleFeatureTemplateSet: FeatureTemplateSet<PuzzleTemplateId, Puzz
         {
           id: PuzzleActionId.ANSWER_WORM,
           label: "Answer: Worm",
-          execute: answerWorm
+          execute: answerWormHelper
         },
         {
           id: PuzzleActionId.ANSWER_CREATIVELY,
           label: "Answer: Bus!",
-          execute: answerCreatively
+          execute: answerCreativelyHelper
         },
         {
           id: PuzzleActionId.ASK_FOR_HINT,
           label: "Ask for a Hint",
-          execute: askForHint
+          execute: askForHintHelper
         },
         {
           id: PuzzleActionId.TRY_TO_FORCE,
           label: "Try to Force It Open",
-          execute: tryToForce
+          execute: tryToForceHelper
         },
         {
           id: PuzzleActionId.WALK_AWAY,
@@ -80,22 +80,22 @@ export const puzzleFeatureTemplateSet: FeatureTemplateSet<PuzzleTemplateId, Puzz
         {
           id: PuzzleActionId.PRESS_SIX,
           label: "Press 6",
-          execute: pressSix
+          execute: pressSixHelper
         },
         {
           id: PuzzleActionId.PRESS_EIGHT,
           label: "Press 8",
-          execute: pressEight
+          execute: pressEightHelper
         },
         {
           id: PuzzleActionId.PRESS_RANDOM,
           label: "Press 42",
-          execute: pressRandom
+          execute: pressRandomHelper
         },
         {
           id: PuzzleActionId.ASK_PATTERN,
           label: "Ask What Pattern",
-          execute: askPattern
+          execute: askPatternHelper
         },
         {
           id: PuzzleActionId.WALK_AWAY,
@@ -121,22 +121,22 @@ export const puzzleFeatureTemplateSet: FeatureTemplateSet<PuzzleTemplateId, Puzz
         {
           id: PuzzleActionId.ANSWER_KEYBOARD,
           label: "Answer: Keyboard",
-          execute: answerKeyboard
+          execute: answerKeyboardHelper
         },
         {
           id: PuzzleActionId.MAKE_WILD_GUESS,
           label: "Answer: A Sandwich!",
-          execute: makeWildGuess
+          execute: makeWildGuessHelper
         },
         {
           id: PuzzleActionId.ASK_FOR_CLUE,
           label: "Ask for a Clue",
-          execute: askForClue
+          execute: askForClueHelper
         },
         {
           id: PuzzleActionId.COMPLIMENT_MIRROR,
           label: "Compliment the Mirror",
-          execute: complimentMirror
+          execute: complimentMirrorHelper
         },
         {
           id: PuzzleActionId.WALK_AWAY,

@@ -1,15 +1,5 @@
 import type { FeatureTemplateSet } from "../../engine/types";
-import {
-  laughAtJoke,
-  groanAtJoke,
-  tellJoke,
-  thinkAboutRiddle,
-  giveUpOnRiddle,
-  answerRiddle,
-  listenToGossip,
-  rejectGossip,
-  shareGossip
-} from "./functions";
+// Note: All actions now use action registry - no direct function imports needed
 import { SocialTemplateId, SocialActionId } from "./types";
 
 // Re-export for external use
@@ -31,17 +21,17 @@ export const socialFeatureTemplateSet: FeatureTemplateSet<SocialTemplateId, Soci
         {
           id: SocialActionId.LAUGH_AT_JOKE,
           label: "Laugh Heartily",
-          execute: laughAtJoke
+          execute: "ACTION_REGISTRY" // Use action registry routing
         },
         {
           id: SocialActionId.GROAN_AT_JOKE,
           label: "Groan Dramatically",
-          execute: groanAtJoke
+          execute: "ACTION_REGISTRY" // Use action registry routing
         },
         {
           id: SocialActionId.TELL_JOKE,
           label: "Tell Your Own Joke",
-          execute: tellJoke
+          execute: "ACTION_REGISTRY" // Use action registry routing
         },
         {
           id: SocialActionId.WALK_AWAY,
@@ -62,17 +52,17 @@ export const socialFeatureTemplateSet: FeatureTemplateSet<SocialTemplateId, Soci
         {
           id: SocialActionId.THINK_ABOUT_RIDDLE,
           label: "Think Carefully",
-          execute: thinkAboutRiddle
+          execute: "ACTION_REGISTRY" // Use action registry routing
         },
         {
           id: SocialActionId.GIVE_UP_ON_RIDDLE,
           label: "That's Too Hard!",
-          execute: giveUpOnRiddle
+          execute: "ACTION_REGISTRY" // Use action registry routing
         },
         {
           id: SocialActionId.ANSWER_RIDDLE,
           label: "An Echo!",
-          execute: answerRiddle
+          execute: "ACTION_REGISTRY" // Use action registry routing
         },
         {
           id: SocialActionId.WALK_AWAY,
@@ -93,17 +83,17 @@ export const socialFeatureTemplateSet: FeatureTemplateSet<SocialTemplateId, Soci
         {
           id: SocialActionId.LISTEN_TO_GOSSIP,
           label: "Listen Intently",
-          execute: listenToGossip
+          execute: "ACTION_REGISTRY" // Use action registry routing
         },
         {
           id: SocialActionId.REJECT_GOSSIP,
           label: "Not Interested in Gossip",
-          execute: rejectGossip
+          execute: "ACTION_REGISTRY" // Use action registry routing
         },
         {
           id: SocialActionId.SHARE_GOSSIP,
           label: "Share Your Own News",
-          execute: shareGossip
+          execute: "ACTION_REGISTRY" // Use action registry routing
         },
         {
           id: SocialActionId.WALK_AWAY,

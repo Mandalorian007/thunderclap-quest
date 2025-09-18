@@ -15,7 +15,9 @@ describe("Discovery Rewards System", () => {
       });
 
       // Execute action directly to test ActionResult
-      const result = await t.mutation(api.features.discovery.functions.eavesdropOnButterflies, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "BUTTERFLY_CONFERENCE",
+        actionId: "EAVESDROP_ON_BUTTERFLIES",
         userId
       });
 
@@ -48,7 +50,9 @@ describe("Discovery Rewards System", () => {
         displayName: "Test Player"
       });
 
-      const result = await t.mutation(api.features.discovery.functions.joinButterflyDebate, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "BUTTERFLY_CONFERENCE",
+        actionId: "JOIN_BUTTERFLY_DEBATE",
         userId
       });
 
@@ -70,7 +74,9 @@ describe("Discovery Rewards System", () => {
         displayName: "Test Player"
       });
 
-      const result = await t.mutation(api.features.discovery.functions.mediateButterflyDispute, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "BUTTERFLY_CONFERENCE",
+        actionId: "MEDIATE_BUTTERFLY_DISPUTE",
         userId
       });
 
@@ -97,7 +103,9 @@ describe("Discovery Rewards System", () => {
         displayName: "Test Player"
       });
 
-      const result = await t.mutation(api.features.discovery.functions.stickHandInPuddle, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "UPSIDE_DOWN_PUDDLE",
+        actionId: "STICK_HAND_IN_PUDDLE",
         userId
       });
 
@@ -117,7 +125,9 @@ describe("Discovery Rewards System", () => {
         displayName: "Test Player"
       });
 
-      const result = await t.mutation(api.features.discovery.functions.drinkFromPuddle, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "UPSIDE_DOWN_PUDDLE",
+        actionId: "DRINK_FROM_PUDDLE",
         userId
       });
 
@@ -139,7 +149,9 @@ describe("Discovery Rewards System", () => {
         displayName: "Test Player"
       });
 
-      const result = await t.mutation(api.features.discovery.functions.knockOnBookDoor, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "BOOK_HOUSE",
+        actionId: "KNOCK_ON_BOOK_DOOR",
         userId
       });
 
@@ -159,7 +171,9 @@ describe("Discovery Rewards System", () => {
         displayName: "Test Player"
       });
 
-      const result = await t.mutation(api.features.discovery.functions.readTheWalls, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "BOOK_HOUSE",
+        actionId: "READ_THE_WALLS",
         userId
       });
 
@@ -214,13 +228,17 @@ describe("Discovery Rewards System", () => {
       });
 
       // First eavesdrop - should get title
-      const result1 = await t.mutation(api.features.discovery.functions.eavesdropOnButterflies, {
+      const result1 = await t.mutation(api.engine.core.executeAction, {
+        templateId: "BUTTERFLY_CONFERENCE",
+        actionId: "EAVESDROP_ON_BUTTERFLIES",
         userId
       });
       expect(result1.rewards.rewards).toHaveLength(2); // XP + Title
 
       // Second eavesdrop - should only get XP
-      const result2 = await t.mutation(api.features.discovery.functions.eavesdropOnButterflies, {
+      const result2 = await t.mutation(api.engine.core.executeAction, {
+        templateId: "BUTTERFLY_CONFERENCE",
+        actionId: "EAVESDROP_ON_BUTTERFLIES",
         userId
       });
       expect(result2.rewards.rewards).toHaveLength(1); // Only XP

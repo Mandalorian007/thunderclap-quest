@@ -5,6 +5,7 @@ import type { RewardBundle } from "../shared/rewards";
 
 // Import ActionResult from shared rewards
 import type { ActionResult } from "../shared/rewards";
+import type { ActionHelperFunction } from "../helpers/actionRegistry";
 
 // Define a more specific function type that matches what Convex mutations actually return
 export type TemplateActionFunction = RegisteredMutation<"public", { userId: string }, Promise<string | null | ActionResult>>;
@@ -12,7 +13,7 @@ export type TemplateActionFunction = RegisteredMutation<"public", { userId: stri
 export type EngineAction<TTemplateIds extends string | number | symbol, TActionIds extends string | number | symbol> = {
   id: TActionIds;
   label: string;
-  execute: TTemplateIds | TemplateActionFunction | FunctionReference<"mutation", "public", { userId: string }, TTemplateIds | null> | null;
+  execute: TTemplateIds | string | null | ActionHelperFunction; // Now supports: template routing, action ID routing, completion, or helper function
 };
 
 export type EngineTemplate<TContent, TTemplateIds extends string | number | symbol, TActionIds extends string | number | symbol> = {

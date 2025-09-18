@@ -14,8 +14,10 @@ describe("Social Rewards System", () => {
         displayName: "Test Player"
       });
 
-      // Execute action directly (not through engine) to test ActionResult
-      const result = await t.mutation(api.features.social.functions.laughAtJoke, {
+      // Execute action through engine action registry to test ActionResult
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "JOKESTER_ENCOUNTER",
+        actionId: "LAUGH_AT_JOKE",
         userId
       });
 
@@ -50,13 +52,17 @@ describe("Social Rewards System", () => {
       });
 
       // First execution
-      const result1 = await t.mutation(api.features.social.functions.laughAtJoke, {
+      const result1 = await t.mutation(api.engine.core.executeAction, {
+        templateId: "JOKESTER_ENCOUNTER",
+        actionId: "LAUGH_AT_JOKE",
         userId
       });
       expect(result1.rewards.rewards).toHaveLength(2); // XP + Title
 
       // Second execution
-      const result2 = await t.mutation(api.features.social.functions.laughAtJoke, {
+      const result2 = await t.mutation(api.engine.core.executeAction, {
+        templateId: "JOKESTER_ENCOUNTER",
+        actionId: "LAUGH_AT_JOKE",
         userId
       });
       expect(result2.rewards.rewards).toHaveLength(1); // Only XP
@@ -82,7 +88,9 @@ describe("Social Rewards System", () => {
         displayName: "Low Level Player"
       });
 
-      const result = await t.mutation(api.features.social.functions.laughAtJoke, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "JOKESTER_ENCOUNTER",
+        actionId: "LAUGH_AT_JOKE",
         userId
       });
 
@@ -109,7 +117,9 @@ describe("Social Rewards System", () => {
         displayName: "Test Player"
       });
 
-      const result = await t.mutation(api.features.social.functions.groanAtJoke, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "JOKESTER_ENCOUNTER",
+        actionId: "GROAN_AT_JOKE",
         userId
       });
 
@@ -137,7 +147,9 @@ describe("Social Rewards System", () => {
       });
 
       // Laugh first
-      const laughResult = await t.mutation(api.features.social.functions.laughAtJoke, {
+      const laughResult = await t.mutation(api.engine.core.executeAction, {
+        templateId: "JOKESTER_ENCOUNTER",
+        actionId: "LAUGH_AT_JOKE",
         userId
       });
       const laughTitle = laughResult.rewards.rewards.find(r => r.icon === "🏆")?.name;
@@ -149,7 +161,9 @@ describe("Social Rewards System", () => {
         displayName: "Test Player 2"
       });
 
-      const groanResult = await t.mutation(api.features.social.functions.groanAtJoke, {
+      const groanResult = await t.mutation(api.engine.core.executeAction, {
+        templateId: "JOKESTER_ENCOUNTER",
+        actionId: "GROAN_AT_JOKE",
         userId: userId2
       });
       const groanTitle = groanResult.rewards.rewards.find(r => r.icon === "🏆")?.name;
@@ -251,7 +265,9 @@ describe("Social Rewards System", () => {
         displayName: "Test Player"
       });
 
-      const result = await t.mutation(api.features.social.functions.laughAtJoke, {
+      const result = await t.mutation(api.engine.core.executeAction, {
+        templateId: "JOKESTER_ENCOUNTER",
+        actionId: "LAUGH_AT_JOKE",
         userId
       });
 

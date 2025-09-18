@@ -1,14 +1,14 @@
 import type { FeatureTemplateSet } from "../../engine/types";
 import {
-  eavesdropOnButterflies,
-  joinButterflyDebate,
-  mediateButterflyDispute,
-  stickHandInPuddle,
-  dropCoinInPuddle,
-  drinkFromPuddle,
-  knockOnBookDoor,
-  readTheWalls,
-  borrowABook
+  eavesdropOnButterfliesHelper,
+  joinButterflyDebateHelper,
+  mediateButterflyDisputeHelper,
+  stickHandInPuddleHelper,
+  dropCoinInPuddleHelper,
+  drinkFromPuddleHelper,
+  knockOnBookDoorHelper,
+  readTheWallsHelper,
+  borrowABookHelper
 } from "./functions";
 import { DiscoveryTemplateId, DiscoveryActionId } from "./types";
 
@@ -30,17 +30,17 @@ export const discoveryFeatureTemplateSet: FeatureTemplateSet<DiscoveryTemplateId
         {
           id: DiscoveryActionId.EAVESDROP_ON_BUTTERFLIES,
           label: "Eavesdrop Quietly",
-          execute: eavesdropOnButterflies
+          execute: eavesdropOnButterfliesHelper
         },
         {
           id: DiscoveryActionId.JOIN_BUTTERFLY_DEBATE,
           label: "Join the Debate",
-          execute: joinButterflyDebate
+          execute: joinButterflyDebateHelper
         },
         {
           id: DiscoveryActionId.MEDIATE_BUTTERFLY_DISPUTE,
           label: "Offer to Mediate",
-          execute: mediateButterflyDispute
+          execute: mediateButterflyDisputeHelper
         },
         {
           id: DiscoveryActionId.WALK_AWAY,
@@ -60,17 +60,17 @@ export const discoveryFeatureTemplateSet: FeatureTemplateSet<DiscoveryTemplateId
         {
           id: DiscoveryActionId.STICK_HAND_IN_PUDDLE,
           label: "Stick Hand In",
-          execute: stickHandInPuddle
+          execute: stickHandInPuddleHelper
         },
         {
           id: DiscoveryActionId.DROP_COIN_IN_PUDDLE,
           label: "Drop a Coin In",
-          execute: dropCoinInPuddle
+          execute: dropCoinInPuddleHelper
         },
         {
           id: DiscoveryActionId.DRINK_FROM_PUDDLE,
           label: "Take a Sip",
-          execute: drinkFromPuddle
+          execute: drinkFromPuddleHelper
         },
         {
           id: DiscoveryActionId.WALK_AWAY,
@@ -90,17 +90,17 @@ export const discoveryFeatureTemplateSet: FeatureTemplateSet<DiscoveryTemplateId
         {
           id: DiscoveryActionId.KNOCK_ON_BOOK_DOOR,
           label: "Knock Politely",
-          execute: knockOnBookDoor
+          execute: knockOnBookDoorHelper
         },
         {
           id: DiscoveryActionId.READ_THE_WALLS,
           label: "Read the Walls",
-          execute: readTheWalls
+          execute: readTheWallsHelper
         },
         {
           id: DiscoveryActionId.BORROW_A_BOOK,
           label: "Try to Borrow a Book",
-          execute: borrowABook
+          execute: borrowABookHelper
         },
         {
           id: DiscoveryActionId.WALK_AWAY,

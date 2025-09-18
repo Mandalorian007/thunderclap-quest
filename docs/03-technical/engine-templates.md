@@ -6,41 +6,256 @@
 - **Enum-based IDs**: Explicit enums for all template and action IDs
 - **Direct object access**: No fragile lookups, compile-time validation
 - **Typed routing**: Template and action references use enum values
-- **Mixed execution**: Actions can be enum routes, Convex functions, or null for completion
+- **Mixed execution**: Actions can be enum routes, helper functions, or null for completion
 
 This creates a **100% backend-supported framework** where feature flows are completely type-safe and automatically validated.
+
+## Architecture Update: Action Registry & Helper Functions
+
+Following Convex best practices, the template engine now uses an **Action Registry + Helper Functions** approach to completely eliminate function-calling-function warnings:
+
+- **Action Registry**: Global registry mapping action keys to helper functions
+- **Helper Functions**: Pure business logic for all action execution
+- **Model Layer**: Data access patterns with computed fields and validations
+- **Template Helpers**: Specialized functions for template execution and content resolution
+- **Engine Core**: Routes through action registry before falling back to direct calls
 
 ## Vertical Slice Organization
 
 Each feature is organized as a complete vertical slice containing all related code:
 
 ```
-features/
-├── chest/                  # Chest encounter feature
-│   ├── types.ts           # Chest template/action ID enums
-│   ├── schema.ts          # Chest/loot data schemas
-│   ├── functions.ts       # Chest-related queries/mutations
-│   ├── templates.ts       # Chest template definitions
-│   └── index.ts           # Feature exports
-├── combat/                # Combat encounter feature
-│   ├── types.ts           # Combat template/action ID enums
-│   ├── schema.ts          # Combat/equipment schemas
-│   ├── functions.ts       # Combat logic
-│   ├── templates.ts       # Combat templates
-│   └── index.ts
-└── profile/               # Player profile feature
-    ├── types.ts           # Profile template/action ID enums
-    ├── schema.ts          # Player data schema
-    ├── functions.ts       # Profile queries/mutations
-    ├── templates.ts       # Profile templates
-    └── index.ts
+convex/
+├── features/               # Feature-based vertical slices
+│   ├── profile/           # Player profile feature
+│   │   ├── types.ts       # Template/action ID enums
+│   │   ├── schema.ts      # Player data schemas
+│   │   ├── functions.ts   # Profile queries/mutations (delegates to helpers)
+│   │   ├── templates.ts   # Profile template definitions
+│   │   └── index.ts       # Feature exports
+│   └── social/            # Social encounter feature
+│       ├── types.ts       # Template/action ID enums
+│       ├── schema.ts      # Social data schemas
+│       ├── functions.ts   # Social logic (delegates to helpers)
+│       ├── templates.ts   # Social templates
+│       └── index.ts
+├── models/                # Model layer - data access + business logic
+│   ├── playerModel.ts     # Player data access, computed fields, operations
+│   └── gameModel.ts       # Game state data access and operations
+├── helpers/               # Helper functions - pure business logic
+│   ├── actionRegistry.ts      # Action helper registration and lookup
+│   ├── progressionHelpers.ts  # XP calculations, level math
+│   ├── gameLevelHelpers.ts    # Game level management
+│   └── templateHelpers.ts     # Template execution logic
+├── engine/                # Core template framework
+│   ├── types.ts           # Core template type definitions
+│   └── core.ts            # Engine functions (delegates to helpers)
+└── shared/                # Shared utilities and types
+    └── rewards.ts         # Reward system types and helpers
 ```
 
-**Benefits of Vertical Slices:**
-- **Cohesion**: All chest-related code lives in `features/chest/`
+**Benefits of the New Architecture:**
+- **Cohesion**: Related code lives together in logical groupings
 - **Independence**: Features can evolve without affecting others
-- **Clarity**: Easy to find and modify feature-specific logic
-- **Scalability**: Add new features without file sprawl
+- **No Function-Calling-Function**: Eliminates Convex warnings by using helper functions
+- **Testability**: Pure helper functions are easy to unit test
+- **Maintainability**: Clear separation between data access, business logic, and API layer
+- **Scalability**: Add new features without structural overhead
+
+## Action Registry Pattern
+
+The Action Registry completely eliminates Convex function-calling-function warnings by routing all template actions through registered helper functions.
+
+### Action Registry (`helpers/actionRegistry.ts`)
+Global registry for mapping action keys to helper functions:
+
+```typescript
+// Global action registry
+const actionRegistry = new Map<string, ActionHelperFunction>();
+
+// Register an action helper function
+export function registerActionHelper(actionId: string, helperFunction: ActionHelperFunction): void {
+  actionRegistry.set(actionId, helperFunction);
+}
+
+// Get an action helper function
+export function getActionHelper(actionId: string): ActionHelperFunction {
+  const helper = actionRegistry.get(actionId);
+  if (!helper) {
+    throw new Error(`Action helper not found for: ${actionId}`);
+  }
+  return helper;
+}
+
+// Check if action exists
+export function hasActionHelper(actionId: string): boolean {
+  return actionRegistry.has(actionId);
+}
+```
+
+### Feature Action Registration
+Each feature registers its action helpers using template.action naming:
+
+```typescript
+// features/puzzle/functions.ts
+import { registerActionHelper } from "../../helpers/actionRegistry";
+
+// Helper function for action execution
+export async function answerWormHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 25, "puzzle.answerWorm");
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Clever");
+
+  const rewards: RewardEntry[] = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
+
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Clever" });
+  }
+
+  return {
+    nextTemplateId: PuzzleTemplateId.PUZZLE_SUCCESS,
+    rewards: { rewards }
+  };
+}
+
+// Register action helper with template.action key
+registerActionHelper("PICKY_MAGIC_DOOR.ANSWER_WORM", answerWormHelper);
+```
+
+### Template Action Execution
+Templates reference helper functions directly, and the engine routes through the registry:
+
+```typescript
+// features/puzzle/templates.ts
+export const puzzleFeatureTemplateSet: FeatureTemplateSet<PuzzleTemplateId, PuzzleActionId> = {
+  startTemplate: PuzzleTemplateId.PICKY_MAGIC_DOOR,
+  templates: {
+    [PuzzleTemplateId.PICKY_MAGIC_DOOR]: {
+      content: { /* template content */ },
+      actions: [
+        {
+          id: PuzzleActionId.ANSWER_WORM,
+          label: "Answer: Worm",
+          execute: answerWormHelper  // Direct helper function reference
+        }
+      ]
+    }
+  }
+};
+```
+
+### Engine Core Routing
+The template engine checks the action registry first, then falls back to direct calls:
+
+```typescript
+// helpers/templateHelpers.ts
+export async function executeTemplateAction(
+  ctx: MutationCtx,
+  templateId: string,
+  actionId: string,
+  userId: string
+): Promise<ActionExecutionResult> {
+  const template = getTemplateFromRegistry(templateId);
+  const action = template.actions.find(a => a.id === actionId);
+
+  if (typeof action.execute === 'string') {
+    // Static routing - return the template ID
+    return { nextTemplateId: action.execute };
+  } else if (action.execute === null) {
+    // Explicit completion
+    return { isComplete: true };
+  } else {
+    // Check action registry first
+    const actionKey = `${templateId}.${actionId}`;
+    if (hasActionHelper(actionKey)) {
+      const helperFunction = getActionHelper(actionKey);
+      const result = await helperFunction(ctx, { userId });
+
+      return {
+        nextTemplateId: result.nextTemplateId || undefined,
+        isComplete: !result.nextTemplateId,
+        rewards: result.rewards
+      };
+    }
+
+    // Fallback to direct function call (for migration support)
+    const result = await action.execute(ctx, { userId });
+    // ... handle result
+  }
+}
+```
+
+## Helper Functions & Model Layer Pattern
+
+### Model Layer (`models/`)
+Contains data access patterns with computed fields and business logic:
+
+```typescript
+// models/playerModel.ts
+import { QueryCtx, MutationCtx } from "../_generated/server";
+
+// Data access with computed fields
+export async function getPlayerWithStats(ctx: QueryCtx | MutationCtx, userId: string) {
+  const player = await getPlayerByUserId(ctx, userId);
+  const gameLevel = await getCurrentGameLevelHelper(ctx);
+
+  return {
+    ...player,
+    calculatedLevel: calculatePlayerLevel(player.xp),
+    xpMultiplier: getXPMultiplier(calculatedLevel, gameLevel),
+    // ... other computed fields
+  };
+}
+
+// Business operations
+export async function updatePlayerXP(ctx: MutationCtx, userId: string, xpAmount: number) {
+  // Business logic here using helper functions
+  return result;
+}
+```
+
+### Helper Functions (`helpers/`)
+Pure functions with no database context dependencies:
+
+```typescript
+// helpers/progressionHelpers.ts
+export function calculatePlayerLevel(totalXP: number): number {
+  // Pure calculation logic
+}
+
+export function getXPMultiplier(playerLevel: number, gameLevel: number): number {
+  // Pure business logic
+}
+```
+
+### Template Helpers (`helpers/templateHelpers.ts`)
+Specialized helpers for template execution:
+
+```typescript
+export async function executeTemplateAction(
+  ctx: MutationCtx,
+  templateId: string,
+  actionId: string,
+  userId: string
+): Promise<ActionExecutionResult> {
+  // Template execution logic using model layer
+}
+```
+
+### Convex Functions (Thin API Layer)
+Feature functions delegate to helpers and model layer:
+
+```typescript
+// features/profile/functions.ts
+export const getPlayerProfileContent = zQuery({
+  args: { userId: z.string() },
+  handler: async (ctx, { userId }) => {
+    const playerWithStats = await getPlayerWithStats(ctx, userId);
+    return formatProfileContent(playerWithStats);
+  }
+});
+```
 
 ## Feature Template Set Definition
 
@@ -53,7 +268,7 @@ export type TemplateActionFunction = RegisteredMutation<"public", { userId: stri
 export type EngineAction<TTemplateIds, TActionIds> = {
   id: TActionIds;
   label: string;
-  execute: TTemplateIds | TemplateActionFunction | FunctionReference<"mutation", "public", { userId: string }, TTemplateIds | null | ActionResult> | null;
+  execute: TTemplateIds | string | null | ActionHelperFunction; // Now supports: template routing, action ID routing, completion, or helper function
 };
 
 export type EngineTemplate<TContent, TTemplateIds, TActionIds> = {
@@ -119,12 +334,12 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
         {
           id: ChestActionId.EXAMINE,
           label: "Examine Closely",
-          execute: api.chest.functions.examineChest
+          execute: examineChestHelper
         },
         {
           id: ChestActionId.FORCE_OPEN,
           label: "Force Open",
-          execute: api.chest.functions.forceOpenChest
+          execute: forceOpenChestHelper
         },
         {
           id: ChestActionId.LEAVE,
@@ -135,17 +350,17 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
     },
 
     [ChestTemplateId.CHEST_EXAMINED]: {
-      content: api.chest.functions.getExamineResults,
+      content: getExamineResultsHelper,
       actions: [
         {
           id: ChestActionId.DISARM,
           label: "Disarm Trap",
-          execute: api.chest.functions.disarmTrap
+          execute: disarmTrapHelper
         },
         {
           id: ChestActionId.TRIGGER,
           label: "Trigger Trap",
-          execute: api.chest.functions.triggerTrap
+          execute: triggerTrapHelper
         },
         {
           id: ChestActionId.STEP_BACK,
@@ -156,22 +371,22 @@ export const chestFeatureTemplateSet: FeatureTemplateSet<ChestTemplateId, ChestA
     },
 
     [ChestTemplateId.LOOT_SELECTION]: {
-      content: api.chest.functions.getLootOptions,
+      content: getLootOptionsHelper,
       actions: [
         {
           id: ChestActionId.TAKE_ITEM,
           label: "Take Item",
-          execute: api.chest.functions.takeSpecificItem
+          execute: takeSpecificItemHelper
         },
         {
           id: ChestActionId.TAKE_COINS,
           label: "Take Coins",
-          execute: api.chest.functions.takeCoins
+          execute: takeCoinsHelper
         },
         {
           id: ChestActionId.TAKE_ALL,
           label: "Take Everything",
-          execute: api.chest.functions.takeAllItems
+          execute: takeAllItemsHelper
         },
         {
           id: ChestActionId.DONE,
@@ -580,9 +795,11 @@ async function handleButtonInteraction(interaction: ButtonInteraction) {
 ## Building New Features
 
 1. **Create Types File**: Define enums for all template and action IDs in `features/{feature}/types.ts`
-2. **Implement Functions**: Backend logic with typed enum return values in `features/{feature}/functions.ts` (imports from `./types`)
-3. **Create Feature Template Set**: Use enums as object keys for direct access in `features/{feature}/templates.ts` (imports from `./types`)
-4. **Add to Engine**: Import feature and add template ID check to `getTemplateFromFeature`
+2. **Implement Helper Functions**: Create helper functions for all actions in `features/{feature}/functions.ts` (imports from `./types`)
+3. **Register Action Helpers**: Register all helpers with `template.action` keys using `registerActionHelper()`
+4. **Create Feature Template Set**: Use enums as object keys and reference helper functions in `features/{feature}/templates.ts` (imports from `./types`)
+5. **Add to Engine**: Import feature template set in `engine/core.ts` and register it
+6. **Import Functions**: Add import for functions file in `engine/core.ts` to trigger action registrations
 
 **Important**: The `types.ts` file prevents circular imports by keeping enums separate from both `functions.ts` and `templates.ts`.
 

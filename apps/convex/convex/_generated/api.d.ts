@@ -43,6 +43,11 @@ import type * as features_social_index from "../features/social/index.js";
 import type * as features_social_templates from "../features/social/templates.js";
 import type * as features_social_types from "../features/social/types.js";
 import type * as features_social from "../features/social.js";
+import type * as helpers_actionRegistry from "../helpers/actionRegistry.js";
+import type * as helpers_gameLevelHelpers from "../helpers/gameLevelHelpers.js";
+import type * as helpers_progressionHelpers from "../helpers/progressionHelpers.js";
+import type * as helpers_templateHelpers from "../helpers/templateHelpers.js";
+import type * as models_playerModel from "../models/playerModel.js";
 import type * as shared_rewards from "../shared/rewards.js";
 
 /**
@@ -84,6 +89,11 @@ declare const fullApi: ApiFromModules<{
   "features/social/templates": typeof features_social_templates;
   "features/social/types": typeof features_social_types;
   "features/social": typeof features_social;
+  "helpers/actionRegistry": typeof helpers_actionRegistry;
+  "helpers/gameLevelHelpers": typeof helpers_gameLevelHelpers;
+  "helpers/progressionHelpers": typeof helpers_progressionHelpers;
+  "helpers/templateHelpers": typeof helpers_templateHelpers;
+  "models/playerModel": typeof models_playerModel;
   "shared/rewards": typeof shared_rewards;
 }>;
 export declare const api: FilterApi<
