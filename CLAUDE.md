@@ -160,10 +160,8 @@ Use the `/load-context` command to systematically review complete project docume
 
 ## Documentation Structure
 
-Comprehensive documentation in `docs/`:
-- **`docs/01-overview/`** - Architecture and core concepts
-- **`docs/02-game-design/`** - Player systems, progression, and combat mechanics
-- **`docs/03-technical/`** - Implementation frameworks and patterns
-- **`docs/04-implementation/`** - Step-by-step implementation guides
+**Essential Context**:
+- **`docs/01-game-context.md`** - Complete game design, mechanics, and progression systems
+- **`docs/02-developer-guide.md`** - Technical implementation guide and architecture patterns
 
-Refer to documentation when implementing new features or understanding existing systems.
+Refer to these files when implementing features or understanding existing systems. These contain all the core information needed to work effectively with this codebase.
