@@ -75,6 +75,7 @@ Thunderclap Quest is a Discord-native action RPG experience featuring:
 ### Essential Context
 - **[Game Context](docs/01-game-context.md)** - Game design, mechanics, and progression systems
 - **[Developer Guide](docs/02-developer-guide.md)** - Technical implementation and architecture patterns
+- **[Roadmap](docs/03-roadmap.md)** - Development progress tracker and implementation priorities
 
 These documents contain all the core information needed to understand and contribute to this project.
 

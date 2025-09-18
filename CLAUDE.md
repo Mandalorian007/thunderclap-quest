@@ -163,5 +163,6 @@ Use the `/load-context` command to systematically review complete project docume
 **Essential Context**:
 - **`docs/01-game-context.md`** - Complete game design, mechanics, and progression systems
 - **`docs/02-developer-guide.md`** - Technical implementation guide and architecture patterns
+- **`docs/03-roadmap.md`** - Development progress tracker and implementation priorities
 
 Refer to these files when implementing features or understanding existing systems. These contain all the core information needed to work effectively with this codebase.
