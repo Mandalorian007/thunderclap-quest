@@ -48,24 +48,51 @@ cd apps/convex && npx convex deploy   # Deploy to Convex
 ## Core Architecture Patterns
 
 ### Schema-First Database Design
-Zod schemas define database tables and provide type safety:
+**Core Pattern**: Zod schemas as single source of truth using `convex-helpers`:
+
 ```typescript
 // features/profile/schema.ts
+import { zodOutputToConvex } from "convex-helpers/server/zod";
+
+export const GearItemSchema = z.object({
+  id: z.string(),
+  slot: z.enum(['helm', 'chest', 'gloves', 'legs', 'mainHand', 'offhand']),
+  itemLevel: z.number(),
+  combatRating: z.number(),
+  rarity: z.enum(['Common', 'Magic', 'Rare']),
+  stats: z.object({
+    Might: z.number().optional(),
+    Focus: z.number().optional(),
+    Sage: z.number().optional(),
+    Armor: z.number().optional(),
+    Evasion: z.number().optional(),
+    Aegis: z.number().optional(),
+  }).default({}),
+  createdAt: z.number(),
+});
+
 export const PlayerSchema = z.object({
-  userId: z.string(),           // Discord ID (primary key)
-  displayName: z.string(),      // Cached Discord username
-  xp: z.number().default(0),    // Experience points
-  level: z.number().default(1), // Current level
+  userId: z.string(),
+  displayName: z.string(),
+  xp: z.number().default(0),
+  level: z.number().default(1),
   titles: z.array(z.string()).default([]),
+  equippedGear: z.object({
+    helm: GearItemSchema.optional(),
+    chest: GearItemSchema.optional(),
+    gloves: GearItemSchema.optional(),
+    legs: GearItemSchema.optional(),
+    mainHand: GearItemSchema.optional(),
+    offhand: GearItemSchema.optional()
+  }).default({}),
   createdAt: z.number(),
   lastActive: z.number(),
 });
 
-// Root schema.ts aggregates all feature schemas
+// Auto-generate database tables
 export default defineSchema({
-  players: defineTable(zodOutputToConvex(PlayerSchema))
-    .index("userId", ["userId"]),
-  // ... other tables
+  players: defineTable(zodOutputToConvex(PlayerSchema)).index("userId", ["userId"]),
+  inventory: defineTable(zodOutputToConvex(InventorySchema)).index("userId", ["userId"]),
 });
 ```
 
@@ -160,12 +187,48 @@ return {
 };
 ```
 
-### Action Result Pattern
-All action helpers return standardized result:
+### Global Reward System
+**Core Pattern**: Unified reward interface with smart helpers:
+
 ```typescript
-interface ActionResult {
-  nextTemplateId: string | null;  // Where to go next (null = complete)
-  rewards?: RewardBundle;         // What player earned (auto-displayed in Discord)
+// shared/rewards.ts
+export interface RewardEntry {
+  icon: string;      // Emoji for display
+  amount: number;    // Quantity earned
+  name: string;      // Human-readable name
+}
+
+export interface ActionResult {
+  nextTemplateId: string | null;
+  rewards?: { rewards: RewardEntry[] };
+}
+
+// Reward constants
+export const XP_REWARD = { icon: "✨", name: "Experience" } as const;
+export const TITLE_REWARD = { icon: "🏆", name: "Title" } as const;
+export const GOLD_REWARD = { icon: "🪙", name: "Gold" } as const;
+
+// Smart helpers - only award when appropriate
+export async function awardXPHelper(ctx: any, userId: string, amount: number): Promise<{ xpAwarded: number }>;
+export async function awardTitleHelper(ctx: any, userId: string, title: string): Promise<boolean>; // true if newly awarded
+
+// Action implementation pattern
+export async function laughAtJokeHelper(ctx: any, { userId }: { userId: string }): Promise<ActionResult> {
+  const xpResult = await awardXPHelper(ctx, userId, 15);
+  const titleAwarded = await awardTitleHelper(ctx, userId, "Good Sport");
+
+  const rewards = [
+    { icon: XP_REWARD.icon, amount: xpResult.xpAwarded, name: XP_REWARD.name }
+  ];
+
+  if (titleAwarded) {
+    rewards.push({ icon: TITLE_REWARD.icon, amount: 1, name: "Good Sport" });
+  }
+
+  return {
+    nextTemplateId: "SOCIAL_SUCCESS",
+    rewards: { rewards }
+  };
 }
 ```
 

@@ -18,11 +18,15 @@
 - **Build Variety**: Players specialize or balance across combat styles for different encounter effectiveness
 
 ### Combat Rating System
-- **Formula**: Average of all equipped gear item levels
+- **Formula**: `Player CR = Average of all equipped gear item levels`
 - **Empty Slots**: Count as current game level (protects new players from huge penalties)
+- **Calculation**: `(Sum of equipped gear CRs + (empty slots × game level)) ÷ 6 total slots`
+- **Examples**:
+  - All gear level 30 → Player CR = 30
+  - 5 pieces level 30 + 1 empty (game level 25) → Player CR = (150 + 25) ÷ 6 = 29.2
+  - New player: 1 level 10 weapon + 5 empty slots → Player CR = (10 + 125) ÷ 6 = 22.5
 - **Encounter Scaling**: All encounters scale to game level, not player combat rating
 - **Power Differential**: Player CR vs Game Level determines damage multipliers
-- **Example**: Player CR 30 vs Game Level 40 = player deals less damage, takes more damage
 
 ## Gear & Equipment Economy
 
@@ -30,8 +34,13 @@
 - **6 Gear Slots**: Helm, Chest, Gloves, Legs, Main Hand, Offhand
 - **Item Levels**: Determine base power and stat ranges
 - **Rarity Tiers**: Common (1 stat), Magic (2 stats), Rare (3 stats)
-- **Stat Rolling**: Each piece gets random stats within level-appropriate ranges
-- **Combat Rating Calculation**: Average of all equipped gear determines player power level
+- **6-Stat System**: Might/Focus/Sage (offensive) vs Armor/Evasion/Aegis (defensive)
+- **Stat Rolling**: Random stats within level-appropriate ranges using formulas:
+  - Max stat value = Item Level ÷ 2 (rounded down)
+  - Gap percentage = 25% - (15% × √(Max) ÷ 32)
+  - Min stat value = Max × (1 - Gap percentage)
+  - Examples: Level 10 = +4 to +5, Level 100 = +40 to +50
+- **Combat Rating**: Each item's itemLevel contributes to player CR calculation
 
 ### Item Economy
 - **Gear** (equipable): Direct character power via stats and combat rating
@@ -40,9 +49,11 @@
 - **Salvage System**: Convert unwanted gear into materials for progression
 
 ### Salvage System
-- **Gear Cleanup**: Convert unwanted equipment into materials
-- **Material Collection**: Ore, Essence, Components, Reagents for future use
-- **Inventory Management**: Prevents gear hoarding through easy disposal
+- **Gear Cleanup**: Convert unwanted equipment into materials via `/inventory` → Gear → Salvage All
+- **Material Collection**: Ore, Essence, Components, Reagents for future crafting systems
+- **Inventory Management**: Prevents gear hoarding through easy one-click disposal
+- **Template Integration**: Uses existing engine for UI - salvage action stays on gear tab with inline rewards
+- **Multi-Type Support**: Hybrid inventory system (equipped gear on player, unequipped in separate inventory table)
 
 ## Social & Community Systems
 
